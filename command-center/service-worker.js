@@ -1,4 +1,4 @@
-const CACHE_NAME = 'food-truck-command-center-v2';
+const CACHE_NAME = 'food-truck-command-center-v3-live-sync';
 const CORE_ASSETS = [
   './',
   './index.html',
