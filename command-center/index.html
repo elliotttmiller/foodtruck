@@ -4,24 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111827" />
-    <meta name="description" content="Food Truck Command Center: sales, CRM, inventory, events, labor, vendors, expenses, reports, and QuickBooks-ready exports." />
+    <meta name="description" content="Food Truck Command Center: live sales, CRM, inventory, events, labor, vendors, expenses, reports, and accounting-ready exports." />
     <title>Food Truck Command Center</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="stylesheet" href="./styles.css" />
     <script>
-      (function bootstrapCommandCenterStorage() {
-        var key = 'ftcc.v1';
+      (function validateCommandCenterStorage() {
+        var key = 'ftcc.live.v2';
         try {
           var raw = window.localStorage.getItem(key);
-          if (!raw) {
-            window.localStorage.setItem(key, JSON.stringify({ settings: {} }));
-            return;
-          }
-          JSON.parse(raw);
+          if (raw) JSON.parse(raw);
         } catch (error) {
-          try {
-            window.localStorage.setItem(key, JSON.stringify({ settings: {} }));
-          } catch (ignored) {}
+          try { window.localStorage.removeItem(key); } catch (ignored) {}
         }
       })();
     </script>
