@@ -7,12 +7,5 @@
   "background_color": "#f8fafc",
   "theme_color": "#111827",
   "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "./icons/app-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "icons": []
 }
