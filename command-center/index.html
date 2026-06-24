@@ -8,6 +8,23 @@
     <title>Food Truck Command Center</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="stylesheet" href="./styles.css" />
+    <script>
+      (function bootstrapCommandCenterStorage() {
+        var key = 'ftcc.v1';
+        try {
+          var raw = window.localStorage.getItem(key);
+          if (!raw) {
+            window.localStorage.setItem(key, JSON.stringify({ settings: {} }));
+            return;
+          }
+          JSON.parse(raw);
+        } catch (error) {
+          try {
+            window.localStorage.setItem(key, JSON.stringify({ settings: {} }));
+          } catch (ignored) {}
+        }
+      })();
+    </script>
   </head>
   <body>
     <noscript>This command center requires JavaScript to run.</noscript>
