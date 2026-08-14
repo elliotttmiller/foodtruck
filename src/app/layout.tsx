@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { inter, merriweather } from './fonts';
+import { barlowCondensed, inter } from './fonts';
 import { SITE_URL, siteConfig } from '@/config/site';
 import { getStructuredDataGraph } from '@/config/structuredData';
 
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${merriweather.variable}`}>
+    <html lang="en" className={`${inter.variable} ${barlowCondensed.variable}`}>
       <head>
         <link rel="alternate" type="text/plain" title="LLM context" href="/llms.txt" />
         <script
