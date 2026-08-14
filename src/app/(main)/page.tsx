@@ -6,7 +6,8 @@ import { ArrowRight, Facebook, Instagram, Menu, X } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import styles from './uffda.module.css';
 
-const BRAND_LOGO = '/brand/uff-da-logo.png';
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH?.replace(/\/$/, '') ?? '';
+const BRAND_LOGO = `${BASE_PATH}/brand/uff-da-logo.png`;
 
 const featuredItems = [
   { name: 'Tot Chopper', description: 'Crispy. Savory. Addictive.' },
