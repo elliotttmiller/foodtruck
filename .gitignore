@@ -1,5 +1,8 @@
+# Dependencies
+node_modules/
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,30 +10,36 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Next.js working/build directories
+.next/
+out/
 
-# Editor
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# IMPORTANT: docs/ is intentionally NOT ignored.
+# `npm run build` copies the static export into docs/ because GitHub Pages
+# publishes this repository from main:/docs.
 
 # Environment
 .env
 .env.local
 .env.*.local
+# .env.production is intentionally committed: it contains public Pages paths only.
 
-# Next.js / tooling
-.next/
-out/
+# Local/tooling output
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
 
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 .cursor/
 mcp.json
