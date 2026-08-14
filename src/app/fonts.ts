@@ -1,13 +1,14 @@
-import { Inter, Merriweather } from 'next/font/google';
+import { Barlow_Condensed, Inter } from 'next/font/google';
 
 export const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
 });
 
-export const merriweather = Merriweather({
-  weight: ['300', '400', '700', '900'],
+export const barlowCondensed = Barlow_Condensed({
   subsets: ['latin'],
-  variable: '--font-merriweather',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-display',
   display: 'swap',
-}); 
+});
