@@ -19,12 +19,15 @@ const navItems = [
 function BurgerIcon() {
   return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 27h40M14 24c2-10 10-15 18-15s16 5 18 15H14Zm-2 8h40M14 40h36l-4 8H18l-4-8Zm2 12h32"/><path d="M20 18h1M31 15h1M43 19h1"/></svg>;
 }
+
 function WingIcon() {
   return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M48 12c-6 2-11 8-14 15-7 2-13 8-17 15-2 4-2 8 1 10 4 4 14 0 22-8 8-8 13-18 13-25 0-3-2-6-5-7Z"/><path d="M18 49c7 1 16-3 22-10"/></svg>;
 }
+
 function FriesIcon() {
   return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 21h28l-3 35H21l-3-35Z"/><path d="M22 21 20 8M28 21 28 5M35 21l1-14M42 21l2-12M18 30h28"/></svg>;
 }
+
 function MinnesotaIcon() {
   return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 7h19l-1 7 5 4-4 6 6 7-9 5-3 9-7 2-4 10-5-9 2-8-4-7 4-8-2-8 3-10Z"/></svg>;
 }
@@ -58,16 +61,24 @@ export default function HomePage() {
         <button className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA home">
           <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.navLogo} />
         </button>
+
         <nav className={styles.desktopNav} aria-label="Primary navigation">
           {navItems.map(([label, id], index) => (
-            <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>{label}</button>
+            <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>
+              {label}
+            </button>
           ))}
         </nav>
+
         <div className={styles.socialNav}>
           <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={22} /></a>
           <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={20} /></a>
         </div>
-        <button className={styles.mobileToggle} onClick={() => setMobileOpen(v => !v)} aria-label="Toggle navigation" aria-expanded={mobileOpen}>{mobileOpen ? <X size={26} /> : <Menu size={26} />}</button>
+
+        <button className={styles.mobileToggle} onClick={() => setMobileOpen(v => !v)} aria-label="Toggle navigation" aria-expanded={mobileOpen}>
+          {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+        </button>
+
         {mobileOpen && (
           <nav className={styles.mobileNav} aria-label="Mobile navigation">
             {navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}
@@ -79,11 +90,15 @@ export default function HomePage() {
         <section id="home" className={styles.hero}>
           <img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} />
           <div className={styles.heroShade} />
+
           <div className={styles.heroContent}>
+            <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.heroLogo} />
             <h1>Good Food.<br />Midwest Soul.</h1>
             <div className={styles.redRule} />
             <p>Smash burgers, bold wings, and loaded fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p>
-            <button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button>
+            <button className={styles.primaryCta} onClick={() => goTo('menu')}>
+              View Menu <ArrowRight size={19} strokeWidth={1.8} />
+            </button>
           </div>
         </section>
 
@@ -91,7 +106,10 @@ export default function HomePage() {
           {features.map(({ title, copy, Icon }) => (
             <article className={styles.featureItem} key={title}>
               <div className={styles.featureIcon}><Icon /></div>
-              <div><h2>{title}</h2><p>{copy}</p></div>
+              <div>
+                <h2>{title}</h2>
+                <p>{copy}</p>
+              </div>
             </article>
           ))}
         </section>
@@ -112,12 +130,20 @@ export default function HomePage() {
         </section>
 
         <section id="gallery" className={styles.gallerySection}>
-          <div className={styles.galleryCopy}><span>UFF-DA</span><h2>Big flavor. No filler.</h2><p>The visual language stays focused on the food: seared beef, glossy wings, crisp fries, and the red-black-white identity that makes the truck recognizable from across the lot.</p></div>
+          <div className={styles.galleryCopy}>
+            <span>UFF-DA</span>
+            <h2>Big flavor. No filler.</h2>
+            <p>The visual language stays focused on the food: seared beef, glossy wings, crisp fries, and the red-black-white identity that makes the truck recognizable from across the lot.</p>
+          </div>
           <div className={styles.galleryImage}><img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA food lineup" /></div>
         </section>
 
         <section id="find-us" className={styles.findSection}>
-          <div><span>Find UFF-DA</span><h2>Follow the truck.</h2><p>Locations and service times move. Follow UFF-DA on social for the current stop, specials, wing flavors, and what is coming off the griddle.</p></div>
+          <div>
+            <span>Find UFF-DA</span>
+            <h2>Follow the truck.</h2>
+            <p>Locations and service times move. Follow UFF-DA on social for the current stop, specials, wing flavors, and what is coming off the griddle.</p>
+          </div>
           <div className={styles.socialButtons}>
             <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer"><Instagram size={19} /> Instagram</a>
             <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer"><Facebook size={18} /> Facebook</a>
