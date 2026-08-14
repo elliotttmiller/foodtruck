@@ -24,15 +24,8 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.businessName }],
   creator: siteConfig.businessName,
   publisher: siteConfig.businessName,
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
   metadataBase: new URL(SITE_URL),
-  alternates: {
-    canonical: '/',
-  },
+  alternates: { canonical: '/' },
   category: 'restaurant',
   openGraph: {
     title: `${siteConfig.businessName} | ${siteConfig.titleSuffix}`,
@@ -46,13 +39,7 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/Truck/truck-4.jpg`,
         width: 1200,
         height: 630,
-        alt: `${siteConfig.businessName} - food`,
-      },
-      {
-        url: `${SITE_URL}/Food/foodtable.webp`,
-        width: 1200,
-        height: 630,
-        alt: `Menu and food at ${siteConfig.businessName}`,
+        alt: `${siteConfig.businessName} food truck`,
       },
     ],
   },
@@ -81,11 +68,7 @@ export const metadata: Metadata = {
     ICBM: `${siteConfig.latitude}, ${siteConfig.longitude}`,
   },
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-    ? {
-        verification: {
-          google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-        },
-      }
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
     : {}),
 };
 
@@ -98,27 +81,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataGraph) }}
         />
-        <script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&v=beta&loading=async`}
-          async
-        />
-        <script
-          src="https://unpkg.com/@googlemaps/places-autocomplete-element@latest/dist/index.min.js"
-          async
-        />
       </head>
       <body>
         <a
-          href="#main-content"
+          href="#home"
           className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-your-orange text-white px-4 py-2 rounded shadow transition-all"
         >
           Skip to main content
         </a>
-        <LayoutClientWrapper>
-          <main id="main-content" tabIndex={-1}>
-            {children}
-          </main>
-        </LayoutClientWrapper>
+        <LayoutClientWrapper>{children}</LayoutClientWrapper>
       </body>
     </html>
   );
