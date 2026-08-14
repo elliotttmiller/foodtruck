@@ -1,12 +1,11 @@
 import './globals.css';
-import '../index.css';
 import type { Metadata, Viewport } from 'next';
 import { inter, merriweather } from './fonts';
-import LayoutClientWrapper from '@/components/LayoutClientWrapper';
 import { SITE_URL, siteConfig } from '@/config/site';
 import { getStructuredDataGraph } from '@/config/structuredData';
 
 const structuredDataGraph = getStructuredDataGraph();
+const brandLogoUrl = `${SITE_URL}/brand/uff-da-logo.png`;
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -36,10 +35,10 @@ export const metadata: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: `${SITE_URL}/Truck/truck-4.jpg`,
+        url: brandLogoUrl,
         width: 1200,
         height: 630,
-        alt: `${siteConfig.businessName} food truck`,
+        alt: `${siteConfig.businessName} Minnesota food truck`,
       },
     ],
   },
@@ -47,7 +46,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${siteConfig.businessName} | ${siteConfig.titleSuffix}`,
     description: siteConfig.description,
-    images: [`${SITE_URL}/Truck/truck-4.jpg`],
+    images: [brandLogoUrl],
     creator: siteConfig.twitterCreator,
   },
   robots: {
@@ -82,15 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataGraph) }}
         />
       </head>
-      <body>
-        <a
-          href="#home"
-          className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-your-orange text-white px-4 py-2 rounded shadow transition-all"
-        >
-          Skip to main content
-        </a>
-        <LayoutClientWrapper>{children}</LayoutClientWrapper>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
