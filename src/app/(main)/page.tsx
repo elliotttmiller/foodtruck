@@ -30,15 +30,26 @@ function FriesIcon() {
 }
 
 function MinnesotaIcon() {
-  // Simplified geographic silhouette: NW notch, northern Angle, Lake Superior edge,
-  // eastern river boundary and southern/western borders retained for recognition.
-  return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M15 8h17V5h5v4h8l-1 5 5 2-4 5 4 4-5 4 2 5-5 3 1 5-5 2-2 8-5 2-2 5H17l1-9-3-6 2-7-3-6 3-7-2-6V8Z"/><path d="M35 52h-7"/></svg>;
+  return (
+    <img
+      src={asset('/brand/mn-outline.png')}
+      alt=""
+      aria-hidden="true"
+      style={{
+        width: '60px',
+        height: '60px',
+        objectFit: 'contain',
+        display: 'block',
+        filter: 'invert(1) sepia(1) saturate(8000%) hue-rotate(344deg) brightness(.92) contrast(1.08)',
+      }}
+    />
+  );
 }
 
 const features = [
   { title: 'Smash Burgers', copy: 'Crispy edges, juicy centers, stacked with flavor.', Icon: BurgerIcon },
   { title: 'Wings Done Right', copy: 'Dry-rubbed or sauced. Bold flavor in every bite.', Icon: WingIcon },
-  { title: 'Loaded Fries', copy: 'Crispy fries with craveable toppings and sauces.', Icon: FriesIcon },
+  { title: 'Fries', copy: 'Hot, crispy fries served as the perfect side.', Icon: FriesIcon },
   { title: 'Midwest Proud', copy: 'Local at heart. Serving Minnesota with pride.', Icon: MinnesotaIcon },
 ];
 
@@ -83,7 +94,7 @@ export default function HomePage() {
             <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.heroLogo} />
             <h1>Good Food.<br />Midwest Soul.</h1>
             <div className={styles.redRule} />
-            <p>Smash burgers, bold wings, and loaded fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p>
+            <p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p>
             <button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button>
           </div>
         </section>
@@ -101,7 +112,7 @@ export default function HomePage() {
           <div className={styles.menuGrid}>
             <article><span>01</span><h3>Smash Burgers</h3><p>Thin patties smashed hard on the griddle for lacey, caramelized edges and a juicy center. Built with melty cheese, pickles, onion, and craveable house sauces.</p></article>
             <article><span>02</span><h3>Wings</h3><p>A rotating mix of dry rubs and sauces, from savory and smoky to sweet, tangy, and hot. Crisp outside, juicy inside, tossed fresh.</p></article>
-            <article><span>03</span><h3>Fries</h3><p>Hot, crispy fries served straight or loaded with sauces and toppings designed to stand beside the burgers and wings—not disappear behind them.</p></article>
+            <article><span>03</span><h3>Fries</h3><p>Hot, crispy fries served as a simple, craveable side that pairs with the burgers and wings.</p></article>
           </div>
         </section>
 
