@@ -5,8 +5,6 @@ import { ArrowRight, Facebook, Instagram, Menu, X } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import styles from './uffda.module.css';
 
-// The landing page is exported to /docs and served from /foodtruck/ on GitHub Pages.
-// Relative public-asset URLs remain valid both in the static Pages build and local dev.
 const asset = (path: string) => path.replace(/^\//, '');
 
 const navItems = [
@@ -14,7 +12,6 @@ const navItems = [
   ['Our Story', 'story'],
   ['Menu', 'menu'],
   ['Find Us', 'find-us'],
-  ['Gallery', 'gallery'],
 ] as const;
 
 function BurgerIcon() {
@@ -30,20 +27,7 @@ function FriesIcon() {
 }
 
 function MinnesotaIcon() {
-  return (
-    <img
-      src={asset('/brand/mn-outline.png')}
-      alt=""
-      aria-hidden="true"
-      style={{
-        width: '60px',
-        height: '60px',
-        objectFit: 'contain',
-        display: 'block',
-        filter: 'invert(1) sepia(1) saturate(8000%) hue-rotate(344deg) brightness(.92) contrast(1.08)',
-      }}
-    />
-  );
+  return <img src={asset('/brand/mn-outline.png')} alt="" aria-hidden="true" className={styles.mnIcon} />;
 }
 
 const features = [
@@ -114,11 +98,6 @@ export default function HomePage() {
             <article><span>02</span><h3>Wings</h3><p>A rotating mix of dry rubs and sauces, from savory and smoky to sweet, tangy, and hot. Crisp outside, juicy inside, tossed fresh.</p></article>
             <article><span>03</span><h3>Fries</h3><p>Hot, crispy fries served as a simple, craveable side that pairs with the burgers and wings.</p></article>
           </div>
-        </section>
-
-        <section id="gallery" className={styles.gallerySection}>
-          <div className={styles.galleryCopy}><span>UFF-DA</span><h2>Big flavor. No filler.</h2><p>The visual language stays focused on the food: seared beef, glossy wings, crisp fries, and the red-black-white identity that makes the truck recognizable from across the lot.</p></div>
-          <div className={styles.galleryImage}><img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA food lineup" /></div>
         </section>
 
         <section id="find-us" className={styles.findSection}>
