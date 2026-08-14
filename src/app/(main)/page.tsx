@@ -6,30 +6,16 @@ import { ArrowRight, Facebook, Instagram, Menu, X } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import styles from './uffda.module.css';
 
+const BRAND_LOGO = '/brand/uff-da-logo.png';
+
 const featuredItems = [
-  {
-    name: 'Tot Chopper',
-    description: 'Crispy. Savory. Addictive.',
-    image: '/Menu_Images/aloo-poori.jpeg',
-  },
-  {
-    name: 'Uff-Da Smash',
-    description: 'Bold, stacked, and made to satisfy.',
-    image: '/Menu_Images/chicken-65-jpg.jpg',
-  },
-  {
-    name: 'Nordic Tacos',
-    description: 'A Midwest twist, built for the road.',
-    image: '/Menu_Images/babycorn-manchurian.jpg',
-  },
+  { name: 'Tot Chopper', description: 'Crispy. Savory. Addictive.' },
+  { name: 'Uff-Da Smash', description: 'Bold, stacked, and made to satisfy.' },
+  { name: 'Nordic Tacos', description: 'A Midwest twist, built for the road.' },
 ];
 
 const navItems = [
-  ['Home', 'home'],
-  ['Our Story', 'story'],
-  ['Menu', 'menu'],
-  ['Find Us', 'find-us'],
-  ['Gallery', 'gallery'],
+  ['Home', 'home'], ['Our Story', 'story'], ['Menu', 'menu'], ['Find Us', 'find-us'], ['Gallery', 'gallery'],
 ] as const;
 
 export default function HomePage() {
@@ -52,29 +38,21 @@ export default function HomePage() {
     <div className={styles.siteShell}>
       <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
         <button className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA home">
-          <Image src="/brand/uffda-logo.jpg" alt="UFF-DA Minnesota" width={1000} height={577} priority className={styles.navLogo} />
+          <Image src={BRAND_LOGO} alt="UFF-DA Minnesota" width={1000} height={577} priority className={styles.navLogo} />
         </button>
-
         <nav className={styles.desktopNav} aria-label="Primary navigation">
-          {navItems.map(([label, id]) => (
-            <button key={id} onClick={() => goTo(id)} className={styles.navLink}>{label}</button>
-          ))}
+          {navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)} className={styles.navLink}>{label}</button>)}
         </nav>
-
         <div className={styles.socialNav}>
           <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={18} /></a>
           <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={18} /></a>
         </div>
-
         <button className={styles.mobileToggle} onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle navigation" aria-expanded={mobileOpen}>
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
-
         {mobileOpen && (
           <nav className={styles.mobileNav} aria-label="Mobile navigation">
-            {navItems.map(([label, id]) => (
-              <button key={id} onClick={() => goTo(id)}>{label}</button>
-            ))}
+            {navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}
             <div className={styles.mobileSocials}>
               <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer"><Instagram size={18} /> Instagram</a>
               <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer"><Facebook size={18} /> Facebook</a>
@@ -86,16 +64,12 @@ export default function HomePage() {
       <main>
         <section id="home" className={styles.hero}>
           <div className={styles.heroCopy}>
-            <Image src="/brand/uffda-logo.jpg" alt="UFF-DA Minnesota, established 2024" width={1000} height={577} priority className={styles.heroLogo} />
+            <Image src={BRAND_LOGO} alt="UFF-DA Minnesota, established 2024" width={1000} height={577} priority className={styles.heroLogo} />
             <p className={styles.heroLead}>Good food. Midwest soul.</p>
             <p className={styles.heroSub}>Bold flavors inspired by where we&apos;re from and the people we feed.</p>
-            <button className={styles.primaryCta} onClick={() => goTo('find-us')}>
-              Find us <ArrowRight size={17} strokeWidth={1.8} />
-            </button>
+            <button className={styles.primaryCta} onClick={() => goTo('find-us')}>Find us <ArrowRight size={17} strokeWidth={1.8} /></button>
           </div>
-          <div className={styles.heroMedia} aria-label="UFF-DA food truck">
-            <Image src="/Truck/truck-4.jpg" alt="Food truck serving guests" fill priority sizes="(max-width: 900px) 100vw, 55vw" className={styles.coverImage} />
-            <div className={styles.heroMediaShade} />
+          <div className={styles.heroMedia} aria-label="UFF-DA food truck visual">
             <div className={styles.truckMark} aria-hidden="true">UFF-DA<span>MINNESOTA</span></div>
           </div>
         </section>
@@ -109,9 +83,7 @@ export default function HomePage() {
             <p>We&apos;re building that same spirit into the food: welcoming, unfussy, memorable, and made for the people gathered around it.</p>
             <button className={styles.outlineCta} onClick={() => goTo('gallery')}>See the vibe <ArrowRight size={16} /></button>
           </div>
-          <div className={styles.storyMedia}>
-            <Image src="/Food/foodtable.webp" alt="A table full of fresh food" fill sizes="(max-width: 900px) 100vw, 60vw" className={styles.coverImage} />
-          </div>
+          <div className={styles.storyMedia} aria-label="UFF-DA brand photography placeholder" />
         </section>
 
         <section id="menu" className={styles.menuSection}>
@@ -120,27 +92,20 @@ export default function HomePage() {
             <h2>Bold. Fresh.<br />Midwest made.</h2>
             <div className={styles.redRule} />
             <p>We keep it simple: quality ingredients, made with care, and packed with flavor.</p>
-            <a className={styles.primaryCta} href="#menu-grid" onClick={(event) => { event.preventDefault(); document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth' }); }}>
-              View menu <ArrowRight size={17} />
-            </a>
+            <a className={styles.primaryCta} href="#menu-grid" onClick={(event) => { event.preventDefault(); document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth' }); }}>View menu <ArrowRight size={17} /></a>
           </div>
           <div id="menu-grid" className={styles.menuGrid}>
             {featuredItems.map((item) => (
               <article className={styles.menuCard} key={item.name}>
-                <div className={styles.menuImageWrap}>
-                  <Image src={item.image} alt={item.name} fill sizes="(max-width: 720px) 100vw, 28vw" className={styles.coverImage} />
-                </div>
-                <h3>{item.name}</h3>
-                <p>{item.description}</p>
+                <div className={styles.menuImageWrap} aria-hidden="true" />
+                <h3>{item.name}</h3><p>{item.description}</p>
               </article>
             ))}
           </div>
         </section>
 
         <section id="gallery" className={styles.galleryBand}>
-          <div className={styles.galleryMedia}>
-            <Image src="/Truck/truck-2.jpg" alt="Food truck gathering at dusk" fill sizes="(max-width: 900px) 100vw, 50vw" className={styles.coverImage} />
-          </div>
+          <div className={styles.galleryMedia} aria-label="UFF-DA gallery photography placeholder" />
           <div id="find-us" className={styles.findPanel}>
             <div className={styles.eyebrowDark}><span>✣</span> Find UFF-DA</div>
             <h2>Always on the move.</h2>
@@ -157,11 +122,9 @@ export default function HomePage() {
 
       <footer className={styles.footer}>
         <button onClick={() => goTo('home')} className={styles.footerBrand} aria-label="Back to top">
-          <span className={styles.footerWordmark}>UFF-DA</span><span className={styles.footerState}>MINNESOTA</span>
+          <Image src={BRAND_LOGO} alt="UFF-DA Minnesota" width={1000} height={577} className={styles.navLogo} />
         </button>
-        <nav aria-label="Footer navigation" className={styles.footerNav}>
-          {navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}
-        </nav>
+        <nav aria-label="Footer navigation" className={styles.footerNav}>{navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}</nav>
         <div className={styles.footerMeta}>© {new Date().getFullYear()} UFF-DA<br />Minnesota</div>
       </footer>
     </div>
