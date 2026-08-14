@@ -1,3 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+html {
+  scroll-behavior: smooth;
+  background: #020202;
+}
+
+body {
+  margin: 0;
+  background: #020202;
+  color: #f8f6f1;
+  font-family: var(--font-sans), Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), 'Arial Narrow', sans-serif !important;
+  font-stretch: condensed;
+  font-style: normal;
+}
+
+h1,
+h2 {
+  font-weight: 700 !important;
+  letter-spacing: 0.015em !important;
+}
+
+h3 {
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+}
+
+button,
+nav,
+footer {
+  font-family: var(--font-sans), Arial, sans-serif;
+}
+
+::selection {
+  background: #db241d;
+  color: #ffffff;
+}
