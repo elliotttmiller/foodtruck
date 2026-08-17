@@ -59,14 +59,39 @@ export default function HomePage() {
       <main>
         <section id="home" className={styles.hero}><img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} /><div className={styles.heroShade} /><div className={styles.heroContent}><h1>Good Food.<br />Midwest Soul.</h1><div className={styles.redRule} /><p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p><button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button></div></section>
         <section className={styles.featureStrip} aria-label="UFF-DA specialties">{features.map(({ title, copy, Icon }) => <article className={styles.featureItem} key={title}><div className={styles.featureIcon}><Icon /></div><div><h2>{title}</h2><p>{copy}</p></div></article>)}</section>
+
         <section id="story" className={styles.storySection}>
-          <div className={styles.sectionKicker}>Our Story</div>
-          <h2>Good food. Done right.</h2>
-          <p>UFF-DA started with a simple idea: take the food people already love and give them something they can’t get everywhere else. We’re always experimenting, creating our own flavor combinations, sauces, seasonings, and twists that bring something different to the table. Our one-of-a-kind dry rubs are a big part of that—developed in-house by pushing beyond the usual seasonings and building bold, original flavor combinations you won’t find anywhere else. Some flavors are familiar, others are unexpected—but everything we make is built to stand on its own and taste unmistakably UFF-DA.</p>
-          <p>Our menu is built around hard-seared smash burgers with crispy edges and juicy centers, bold wings tossed in sauce or coated in our signature dry rubs, and hot, crispy fries made to go with just about everything. Every item is about taking something familiar and making it worth coming back for.</p>
-          <p>For us, good food is about more than what’s on the menu. It’s about serving something you’re genuinely excited to hand across the counter. Food that’s fresh, satisfying, and made with the same attention we’d expect if we were the ones ordering it.</p>
-          <p>That’s what UFF-DA is about: keeping things straightforward, doing them well, and serving seriously good food with flavors you won’t find just anywhere.</p>
+          <div className={styles.storyInner}>
+            <div className={styles.storyHeader}>
+              <div className={styles.storyTitleBlock}>
+                <div className={styles.sectionKicker}>Our Story</div>
+                <h2>Good food.<br />Done right.</h2>
+              </div>
+              <div className={styles.storyLead}>
+                <p>UFF-DA started with a simple idea: take the food people already love and give them something they can’t get everywhere else. We’re always experimenting, creating our own flavor combinations, sauces, seasonings, and twists that bring something different to the table.</p>
+                <p>Our one-of-a-kind dry rubs are a big part of that—developed in-house by pushing beyond the usual seasonings and building bold, original flavor combinations you won’t find anywhere else. Some flavors are familiar, others are unexpected—but everything we make is built to stand on its own and taste unmistakably UFF-DA.</p>
+              </div>
+            </div>
+
+            <div className={styles.storyDivider} />
+
+            <div className={styles.storyDetails}>
+              <article className={styles.storyDetail}>
+                <span>What we make</span>
+                <p>Our menu is built around hard-seared smash burgers with crispy edges and juicy centers, bold wings tossed in sauce or coated in our signature dry rubs, and hot, crispy fries made to go with just about everything.</p>
+              </article>
+              <article className={styles.storyDetail}>
+                <span>Why it matters</span>
+                <p>For us, good food is about more than what’s on the menu. It’s about serving something you’re genuinely excited to hand across the counter—fresh, satisfying food made with the same attention we’d expect if we were the ones ordering it.</p>
+              </article>
+              <article className={styles.storyDetail}>
+                <span>The UFF-DA standard</span>
+                <p>Every item is about taking something familiar and making it worth coming back for. Keep it straightforward, do it well, and serve seriously good food with flavors you won’t find just anywhere.</p>
+              </article>
+            </div>
+          </div>
         </section>
+
         <section id="menu" className={styles.menuSection}>
           <div className={styles.sectionHeading}><span>The Menu</span><h2>Three things. Done right.</h2></div>
           <div className={styles.menuGrid}>{menuItems.map(item => <article key={item.title}><div className={styles.menuPhoto}><img src={asset(item.image)} alt={item.alt} className={item.crop} loading="lazy" /></div><div className={styles.menuCopy}><h3>{item.title}</h3><p>{item.copy}</p></div></article>)}</div>
