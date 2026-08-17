@@ -22,10 +22,10 @@ export const metadata: Metadata = {
   publisher: siteConfig.businessName,
   metadataBase: new URL(SITE_URL),
   icons: {
-    icon: [{ url: '/brand/favicon.svg', type: 'image/svg+xml' }],
-    shortcut: '/brand/favicon.svg',
-    apple: '/brand/favicon.svg',
+    icon: [{ url: '/favicon.ico', type: 'image/x-icon', sizes: 'any' }],
+    shortcut: '/favicon.ico',
   },
+  manifest: '/manifest.json',
   alternates: { canonical: '/' },
   category: 'restaurant',
   openGraph: {
