@@ -1,10 +1,18 @@
 import { SITE_URL, siteConfig, sameAsSocial } from '@/config/site';
 
-function googleMapsSearchUrl(): string {
-  const q = encodeURIComponent(
-    `${siteConfig.addressLine}, ${siteConfig.addressCity}, ${siteConfig.addressRegion} ${siteConfig.addressPostal}`,
-  );
-  return `https://www.google.com/maps/search/?api=1&query=${q}`;
+function googleMapsSearchUrl(): string | undefined {
+  const location = [
+    siteConfig.addressLine,
+    siteConfig.addressCity,
+    siteConfig.addressRegion,
+    siteConfig.addressPostal,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  if (!location) return undefined;
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 }
 
 export function getStructuredDataGraph() {
@@ -13,14 +21,7 @@ export function getStructuredDataGraph() {
     '@type': 'Restaurant',
     name: siteConfig.businessName,
     description: siteConfig.description,
-    image: [
-      `${SITE_URL}/Truck/truck-4.jpg`,
-      `${SITE_URL}/Truck/truck-3.jpg`,
-      `${SITE_URL}/Food/foodtable.webp`,
-    ],
     url: SITE_URL,
-    telephone: siteConfig.phoneE164,
-    email: siteConfig.emailContact,
     address: {
       '@type': 'PostalAddress',
       streetAddress: siteConfig.addressLine,
@@ -29,14 +30,9 @@ export function getStructuredDataGraph() {
       postalCode: siteConfig.addressPostal,
       addressCountry: siteConfig.addressCountry,
     },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: siteConfig.latitude,
-      longitude: siteConfig.longitude,
-    },
     areaServed: [
       {
-        '@type': 'City',
+        '@type': 'AdministrativeArea',
         name: siteConfig.areaServedCity,
         containedInPlace: { '@type': 'State', name: siteConfig.addressStateName },
       },
@@ -45,8 +41,6 @@ export function getStructuredDataGraph() {
         name: siteConfig.areaServedMetro,
       },
     ],
-    hasMap: googleMapsSearchUrl(),
-    openingHours: [siteConfig.openingHoursSchema],
     servesCuisine: siteConfig.servesCuisine,
     priceRange: '$$',
     paymentAccepted: siteConfig.paymentAccepted,
@@ -56,13 +50,12 @@ export function getStructuredDataGraph() {
     sameAs: sameAsSocial,
   };
 
-  if (siteConfig.schemaRatingValue && siteConfig.schemaReviewCount) {
-    restaurant.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: siteConfig.schemaRatingValue,
-      reviewCount: Number.parseInt(siteConfig.schemaReviewCount, 10) || siteConfig.schemaReviewCount,
-    };
-  }
+  if (siteConfig.phoneE164) restaurant.telephone = siteConfig.phoneE164;
+  if (siteConfig.emailContact) restaurant.email = siteConfig.emailContact;
+
+  const mapUrl = googleMapsSearchUrl();
+  if (mapUrl) restaurant.hasMap = mapUrl;
+  if (siteConfig.openingHoursSchema) restaurant.openingHours = [siteConfig.openingHoursSchema];
 
   const website = {
     '@context': 'https://schema.org',
