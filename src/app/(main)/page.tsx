@@ -23,11 +23,7 @@ function WingIcon() {
 }
 
 function FriesIcon() {
-  return (
-    <svg viewBox="0 0 80 80" aria-hidden="true">
-      <path d="M18 34 11 20c-1-2 0-4 2-4 5 0 9 3 12 8l4 9" /><path d="M26 34 22 12c0-2 1-3 3-3h3c2 0 3 1 3 3l3 21" /><path d="M35 33 34 5c0-2 1-3 3-3h4c2 0 3 1 3 3l-1 28" /><path d="M44 33 49 10c0-2 2-3 4-2l3 1c2 1 2 2 2 4l-6 22" /><path d="M53 35 62 13c1-2 3-2 4-1l3 2c2 1 2 3 1 5L60 38" /><path d="M59 38 68 24c1-2 3-2 5-1 2 1 2 3 1 5l-8 15" /><path d="M16 36c7 7 15 10 24 10s18-3 25-10l-5 37c-7 3-13 4-20 4s-14-1-20-4l-4-37Z" /><path d="M16 36c7 7 15 10 24 10s18-3 25-10" /><path d="M24 25l3 8M39 18v13M51 20l-3 12M63 28l-5 9" />
-    </svg>
-  );
+  return <img src={asset('/brand/fries-outline.svg')} alt="" aria-hidden="true" />;
 }
 
 function MinnesotaIcon() { return <img src={asset('/brand/mn-outline.svg')} alt="" aria-hidden="true" className={styles.mnIcon} />; }
