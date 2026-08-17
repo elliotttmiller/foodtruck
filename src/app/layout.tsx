@@ -14,10 +14,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: {
-    default: `${siteConfig.businessName} | ${siteConfig.titleSuffix}`,
-    template: `%s | ${siteConfig.businessName}`,
-  },
+  title: 'UFF-DA',
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   authors: [{ name: siteConfig.businessName }],
@@ -47,7 +44,6 @@ export const metadata: Metadata = {
     title: `${siteConfig.businessName} | ${siteConfig.titleSuffix}`,
     description: siteConfig.description,
     images: [brandLogoUrl],
-    creator: siteConfig.twitterCreator,
   },
   robots: {
     index: true,
@@ -63,8 +59,6 @@ export const metadata: Metadata = {
   other: {
     'geo.region': siteConfig.geoRegionMeta,
     'geo.placename': siteConfig.geoPlacename,
-    'geo.position': `${siteConfig.latitude};${siteConfig.longitude}`,
-    ICBM: `${siteConfig.latitude}, ${siteConfig.longitude}`,
   },
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
