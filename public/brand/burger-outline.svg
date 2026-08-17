@@ -1,9 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1213 980" role="img" aria-label="Burger icon">
-  <defs>
-    <filter id="brand-red" color-interpolation-filters="sRGB">
-      <feFlood flood-color="#ed1c24" result="red"/>
-      <feComposite in="red" in2="SourceAlpha" operator="in"/>
-    </filter>
-  </defs>
-  <image href="burger-outline-source.svg" width="1213" height="980" filter="url(#brand-red)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none" role="img" aria-label="Burger icon">
+  <g stroke="#ed1c24" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 42C18 24 35 12 60 12s42 12 44 30H16Z"/>
+    <path d="M14 50h92"/>
+    <path d="M18 59h84"/>
+    <path d="M19 61c8 0 11 7 20 7s12-7 21-7 12 7 21 7 11-7 20-7"/>
+    <path d="M20 75h80"/>
+    <path d="M23 76h74v11H23Z"/>
+    <path d="M38 26l2-1M50 20l2 1M63 27l2-2M76 20l2 1M87 29l2 1"/>
+  </g>
 </svg>
