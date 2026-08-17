@@ -6,6 +6,8 @@ import { getStructuredDataGraph } from '@/config/structuredData';
 
 const structuredDataGraph = getStructuredDataGraph();
 const brandLogoUrl = `${SITE_URL}/brand/uff-da-logo.png`;
+const faviconUrl = `${SITE_URL}/favicon.ico`;
+const manifestUrl = `${SITE_URL}/manifest.json`;
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -22,11 +24,11 @@ export const metadata: Metadata = {
   publisher: siteConfig.businessName,
   metadataBase: new URL(SITE_URL),
   icons: {
-    icon: [{ url: '/favicon.ico', type: 'image/x-icon', sizes: 'any' }],
-    shortcut: '/favicon.ico',
+    icon: [{ url: faviconUrl, type: 'image/x-icon', sizes: '16x16 32x32 48x48' }],
+    shortcut: faviconUrl,
   },
-  manifest: '/manifest.json',
-  alternates: { canonical: '/' },
+  manifest: manifestUrl,
+  alternates: { canonical: SITE_URL },
   category: 'restaurant',
   openGraph: {
     title: `${siteConfig.businessName} | ${siteConfig.titleSuffix}`,
@@ -74,7 +76,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${barlowCondensed.variable}`}>
       <head>
-        <link rel="alternate" type="text/plain" title="LLM context" href="/llms.txt" />
+        <link rel="icon" href={faviconUrl} type="image/x-icon" />
+        <link rel="shortcut icon" href={faviconUrl} type="image/x-icon" />
+        <link rel="alternate" type="text/plain" title="LLM context" href={`${SITE_URL}/llms.txt`} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataGraph) }}
