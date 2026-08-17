@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   creator: siteConfig.businessName,
   publisher: siteConfig.businessName,
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: [{ url: '/brand/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/brand/favicon.svg',
+    apple: '/brand/favicon.svg',
+  },
   alternates: { canonical: '/' },
   category: 'restaurant',
   openGraph: {
