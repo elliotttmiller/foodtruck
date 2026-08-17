@@ -33,22 +33,12 @@ function WingIcon() {
 function FriesIcon() {
   return (
     <svg viewBox="0 0 80 80" aria-hidden="true">
-      <path d="M18 34 11 20c-1-2 0-4 2-4 5 0 9 3 12 8l4 9" />
-      <path d="M26 34 22 12c0-2 1-3 3-3h3c2 0 3 1 3 3l3 21" />
-      <path d="M35 33 34 5c0-2 1-3 3-3h4c2 0 3 1 3 3l-1 28" />
-      <path d="M44 33 49 10c0-2 2-3 4-2l3 1c2 1 2 2 2 4l-6 22" />
-      <path d="M53 35 62 13c1-2 3-2 4-1l3 2c2 1 2 3 1 5L60 38" />
-      <path d="M59 38 68 24c1-2 3-2 5-1 2 1 2 3 1 5l-8 15" />
-      <path d="M16 36c7 7 15 10 24 10s18-3 25-10l-5 37c-7 3-13 4-20 4s-14-1-20-4l-4-37Z" />
-      <path d="M16 36c7 7 15 10 24 10s18-3 25-10" />
-      <path d="M24 25l3 8M39 18v13M51 20l-3 12M63 28l-5 9" />
+      <path d="M18 34 11 20c-1-2 0-4 2-4 5 0 9 3 12 8l4 9" /><path d="M26 34 22 12c0-2 1-3 3-3h3c2 0 3 1 3 3l3 21" /><path d="M35 33 34 5c0-2 1-3 3-3h4c2 0 3 1 3 3l-1 28" /><path d="M44 33 49 10c0-2 2-3 4-2l3 1c2 1 2 2 2 4l-6 22" /><path d="M53 35 62 13c1-2 3-2 4-1l3 2c2 1 2 3 1 5L60 38" /><path d="M59 38 68 24c1-2 3-2 5-1 2 1 2 3 1 5l-8 15" /><path d="M16 36c7 7 15 10 24 10s18-3 25-10l-5 37c-7 3-13 4-20 4s-14-1-20-4l-4-37Z" /><path d="M16 36c7 7 15 10 24 10s18-3 25-10" /><path d="M24 25l3 8M39 18v13M51 20l-3 12M63 28l-5 9" />
     </svg>
   );
 }
 
-function MinnesotaIcon() {
-  return <img src={asset('/brand/mn-outline.svg')} alt="" aria-hidden="true" className={styles.mnIcon} />;
-}
+function MinnesotaIcon() { return <img src={asset('/brand/mn-outline.svg')} alt="" aria-hidden="true" className={styles.mnIcon} />; }
 
 const features = [
   { title: 'Smash Burgers', copy: 'Crispy edges, juicy centers, stacked with flavor.', Icon: BurgerIcon },
@@ -57,75 +47,37 @@ const features = [
   { title: 'Midwest Proud', copy: 'Local at heart. Serving Minnesota with pride.', Icon: MinnesotaIcon },
 ];
 
+const menuItems = [
+  { number: '01', title: 'Smash Burgers', copy: 'Thin patties smashed hard on the griddle for lacey, caramelized edges and a juicy center. Built with melty cheese, pickles, onion, and craveable house sauces.', crop: styles.menuBurger, alt: 'UFF-DA smash burger with melted cheese, pickles, onion, and house sauce' },
+  { number: '02', title: 'Wings', copy: 'A rotating mix of dry rubs and sauces, from savory and smoky to sweet, tangy, and hot. Crisp outside, juicy inside, tossed fresh.', crop: styles.menuWings, alt: 'UFF-DA sauced chicken wings' },
+  { number: '03', title: 'Fries', copy: 'Hot, crispy fries served as a simple, craveable side that pairs with the burgers and wings.', crop: styles.menuFries, alt: 'UFF-DA hot crispy fries' },
+];
+
 export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const goTo = (id: string) => {
-    setMobileOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 16); onScroll(); window.addEventListener('scroll', onScroll, { passive: true }); return () => window.removeEventListener('scroll', onScroll); }, []);
+  const goTo = (id: string) => { setMobileOpen(false); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
 
   return (
     <div className={styles.siteShell}>
       <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
-        <button className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA home">
-          <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.navLogo} />
-        </button>
-        <nav className={styles.desktopNav} aria-label="Primary navigation">
-          {navItems.map(([label, id], index) => <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>{label}</button>)}
-        </nav>
-        <div className={styles.socialNav}>
-          <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={22} /></a>
-          <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={20} /></a>
-        </div>
+        <button className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA home"><img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.navLogo} /></button>
+        <nav className={styles.desktopNav} aria-label="Primary navigation">{navItems.map(([label, id], index) => <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>{label}</button>)}</nav>
+        <div className={styles.socialNav}><a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={22} /></a><a href={siteConfig.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={20} /></a></div>
         <button className={styles.mobileToggle} onClick={() => setMobileOpen(v => !v)} aria-label="Toggle navigation" aria-expanded={mobileOpen}>{mobileOpen ? <X size={26} /> : <Menu size={26} />}</button>
         {mobileOpen && <nav className={styles.mobileNav} aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}</nav>}
       </header>
-
       <main>
-        <section id="home" className={styles.hero}>
-          <img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} />
-          <div className={styles.heroShade} />
-          <div className={styles.heroContent}>
-            <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.heroLogo} />
-            <h1>Good Food.<br />Midwest Soul.</h1>
-            <div className={styles.redRule} />
-            <p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p>
-            <button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button>
-          </div>
-        </section>
-
-        <section className={styles.featureStrip} aria-label="UFF-DA specialties">
-          {features.map(({ title, copy, Icon }) => <article className={styles.featureItem} key={title}><div className={styles.featureIcon}><Icon /></div><div><h2>{title}</h2><p>{copy}</p></div></article>)}
-        </section>
-
-        <section id="story" className={styles.storySection}>
-          <div className={styles.sectionKicker}>Our Story</div><h2>Built around the food people actually crave.</h2><p>UFF-DA is a Minnesota food truck centered on hard-seared smash burgers, wings with serious dry-rub and sauce options, and hot, crispy fries. Straightforward food, strong flavor, and a Midwest point of view.</p>
-        </section>
-
+        <section id="home" className={styles.hero}><img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} /><div className={styles.heroShade} /><div className={styles.heroContent}><img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" className={styles.heroLogo} /><h1>Good Food.<br />Midwest Soul.</h1><div className={styles.redRule} /><p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p><button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button></div></section>
+        <section className={styles.featureStrip} aria-label="UFF-DA specialties">{features.map(({ title, copy, Icon }) => <article className={styles.featureItem} key={title}><div className={styles.featureIcon}><Icon /></div><div><h2>{title}</h2><p>{copy}</p></div></article>)}</section>
+        <section id="story" className={styles.storySection}><div className={styles.sectionKicker}>Our Story</div><h2>Built around the food people actually crave.</h2><p>UFF-DA is a Minnesota food truck centered on hard-seared smash burgers, wings with serious dry-rub and sauce options, and hot, crispy fries. Straightforward food, strong flavor, and a Midwest point of view.</p></section>
         <section id="menu" className={styles.menuSection}>
           <div className={styles.sectionHeading}><span>The Menu</span><h2>Three things. Done right.</h2></div>
-          <div className={styles.menuGrid}>
-            <article><span>01</span><h3>Smash Burgers</h3><p>Thin patties smashed hard on the griddle for lacey, caramelized edges and a juicy center. Built with melty cheese, pickles, onion, and craveable house sauces.</p></article>
-            <article><span>02</span><h3>Wings</h3><p>A rotating mix of dry rubs and sauces, from savory and smoky to sweet, tangy, and hot. Crisp outside, juicy inside, tossed fresh.</p></article>
-            <article><span>03</span><h3>Fries</h3><p>Hot, crispy fries served as a simple, craveable side that pairs with the burgers and wings.</p></article>
-          </div>
+          <div className={styles.menuGrid}>{menuItems.map(item => <article key={item.title}><div className={styles.menuPhoto}><img src={asset('/brand/hero-uffda-food.webp')} alt={item.alt} className={item.crop} loading="lazy" /></div><div className={styles.menuCopy}><span>{item.number}</span><h3>{item.title}</h3><p>{item.copy}</p></div></article>)}</div>
         </section>
-
-        <section id="find-us" className={styles.findSection}>
-          <div><span>Find UFF-DA</span><h2>Follow the truck.</h2><p>Locations and service times move. Follow UFF-DA on social for the current stop, specials, wing flavors, and what is coming off the griddle.</p></div>
-          <div className={styles.socialButtons}><a href={siteConfig.social.instagram} target="_blank" rel="noreferrer"><Instagram size={19} /> Instagram</a><a href={siteConfig.social.facebook} target="_blank" rel="noreferrer"><Facebook size={18} /> Facebook</a></div>
-        </section>
+        <section id="find-us" className={styles.findSection}><div><span>Find UFF-DA</span><h2>Follow the truck.</h2><p>Locations and service times move. Follow UFF-DA on social for the current stop, specials, wing flavors, and what is coming off the griddle.</p></div><div className={styles.socialButtons}><a href={siteConfig.social.instagram} target="_blank" rel="noreferrer"><Instagram size={19} /> Instagram</a><a href={siteConfig.social.facebook} target="_blank" rel="noreferrer"><Facebook size={18} /> Facebook</a></div></section>
       </main>
-
       <footer className={styles.footer}><img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Minnesota" /><div>Smash Burgers · Wings · Fries</div><div>© {new Date().getFullYear()} UFF-DA</div></footer>
     </div>
   );
