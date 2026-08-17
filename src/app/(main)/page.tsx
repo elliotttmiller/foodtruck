@@ -57,7 +57,14 @@ export default function HomePage() {
         {mobileOpen && <nav className={styles.mobileNav} aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}</nav>}
       </header>
       <main>
-        <section id="home" className={styles.hero}><img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} /><div className={styles.heroShade} /><div className={styles.heroContent}><h1>Good Food.<br />Midwest Soul.</h1><div className={styles.redRule} /><p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p><button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button></div></section>
+        <section id="home" className={styles.hero}>
+          <picture>
+            <source media="(max-width: 820px)" srcSet={asset('/brand/hero-uffda-food-mobile.webp')} />
+            <img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} />
+          </picture>
+          <div className={styles.heroShade} />
+          <div className={styles.heroContent}><h1>Good Food.<br />Midwest Soul.</h1><div className={styles.redRule} /><p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p><button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={19} strokeWidth={1.8} /></button></div>
+        </section>
         <section className={styles.featureStrip} aria-label="UFF-DA specialties">{features.map(({ title, copy, Icon }) => <article className={styles.featureItem} key={title}><div className={styles.featureIcon}><Icon /></div><div><h2>{title}</h2><p>{copy}</p></div></article>)}</section>
 
         <section id="story" className={styles.storySection}>
