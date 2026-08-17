@@ -1,9 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" role="img" aria-label="Fries icon">
-  <defs>
-    <filter id="brand-red" color-interpolation-filters="sRGB">
-      <feFlood flood-color="#ed1c24" result="red"/>
-      <feComposite in="red" in2="SourceAlpha" operator="in"/>
-    </filter>
-  </defs>
-  <image href="fries-outline-source.svg" width="1254" height="1254" filter="url(#brand-red)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" role="img" aria-label="Fries icon">
+  <g stroke="#ed1c24" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 51 17 27c-1-3 1-5 4-5 7 1 12 6 16 15l6 13"/>
+    <path d="M38 49 30 17c-1-3 1-5 4-5h4c3 0 4 2 5 5l5 31"/>
+    <path d="M49 48 47 10c0-3 2-5 5-5h5c3 0 5 2 5 5v38"/>
+    <path d="M61 48 65 8c0-3 3-5 6-4l5 1c3 1 4 3 3 6l-7 39"/>
+    <path d="M73 50 83 14c1-3 4-4 7-3l5 2c3 1 4 4 2 7L84 53"/>
+    <path d="M84 53 98 29c2-3 5-3 7-1l4 3c2 2 2 5 0 7L95 58"/>
+    <path d="M25 54c10 10 22 15 36 15s27-5 37-15l-10 53c-8 4-17 6-27 6s-20-2-28-6L25 54Z"/>
+    <path d="M25 54c10 10 22 15 36 15s27-5 37-15"/>
+    <path d="M34 39l5 11M50 30l2 17M67 28l-2 19M83 35l-6 16M98 42l-8 13"/>
+  </g>
 </svg>
