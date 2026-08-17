@@ -19,15 +19,7 @@ function BurgerIcon() {
 }
 
 function WingIcon() {
-  return (
-    <svg viewBox="0 0 96 64" aria-hidden="true">
-      <path d="M8 42c7-3 11-10 15-18 4-9 10-15 18-17 7-2 12 1 13 7 1 6-2 14-7 20-6 7-14 11-23 13-7 2-13 1-16-5Z" />
-      <path d="M42 19c6-6 13-9 20-8 6 1 10 5 9 11-1 7-6 13-12 18-7 5-14 8-22 7" />
-      <path d="M50 43c6-2 10-7 14-13 5-8 11-13 18-12 6 1 9 5 7 11-2 7-8 13-14 18-7 5-14 7-20 5-3-1-5-4-5-9Z" />
-      <path d="M15 39c6-2 11-7 15-14M24 43c7-3 13-8 17-15M48 18c5 1 10 4 13 8M55 38c6-3 11-8 15-14M63 46c7-3 13-8 17-15" />
-      <path d="M8 42c2 3 6 4 10 3M50 43c2 3 5 5 9 5" />
-    </svg>
-  );
+  return <img src={asset('/brand/wings-outline.svg')} alt="" aria-hidden="true" />;
 }
 
 function FriesIcon() {
