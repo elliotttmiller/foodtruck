@@ -15,7 +15,7 @@ const navItems = [
 ] as const;
 
 function BurgerIcon() {
-  return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 29h44M13 25c1-10 9-16 19-16s18 6 19 16H13Z"/><path d="M12 34h40l-5 7H17l-5-7Zm3 12h34l-4 8H19l-4-8Z"/><path d="M20 18h.5M31.5 14h.5M43 18h.5"/></svg>;
+  return <img src={asset('/brand/burger-outline.svg')} alt="" aria-hidden="true" />;
 }
 
 function WingIcon() {
