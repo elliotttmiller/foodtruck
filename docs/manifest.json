@@ -1,15 +1,16 @@
 {
   "name": "UFF-DA",
   "short_name": "UFF-DA",
-  "start_url": "/",
+  "start_url": "/foodtruck/",
+  "scope": "/foodtruck/",
   "display": "standalone",
-  "background_color": "#F6F0E6",
-  "theme_color": "#102B23",
+  "background_color": "#020202",
+  "theme_color": "#020202",
   "description": "Good food. Midwest soul.",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "16x16 32x32",
+      "src": "/foodtruck/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
       "type": "image/x-icon"
     }
   ],
