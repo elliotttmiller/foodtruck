@@ -34,7 +34,7 @@
 .featureItem:first-child { padding-left:0; }.featureItem:last-child { border-right:0; padding-right:0; }
 .featureIcon { width:64px; height:64px; display:grid; place-items:center; }
 .featureIcon svg { width:60px; height:60px; fill:none; stroke:var(--red); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
-.mnIcon { width:60px; height:60px; object-fit:contain; display:block; filter:invert(1) sepia(1) saturate(8000%) hue-rotate(344deg) brightness(.92) contrast(1.08); }
+.mnIcon { width:60px; height:60px; object-fit:contain; display:block; filter:brightness(0) saturate(100%) invert(21%) sepia(99%) saturate(4347%) hue-rotate(356deg) brightness(95%) contrast(94%); }
 .featureItem h2 { margin:0 0 8px; color:#fff; text-transform:uppercase; letter-spacing:.025em; font-size:16px; line-height:1.15; }
 .featureItem p { margin:0; color:#d0cbc5; font-size:13px; line-height:1.52; max-width:220px; }
 .storySection { padding:110px clamp(34px,8vw,150px); background:#090909; text-align:center; border-bottom:1px solid var(--line); }
