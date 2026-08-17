@@ -27,7 +27,7 @@ function FriesIcon() {
 }
 
 function MinnesotaIcon() {
-  return <img src={asset('/brand/mn-outline.png')} alt="" aria-hidden="true" className={styles.mnIcon} />;
+  return <img src={asset('/brand/mn-outline.svg')} alt="" aria-hidden="true" className={styles.mnIcon} />;
 }
 
 const features = [
