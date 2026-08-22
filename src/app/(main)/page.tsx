@@ -50,16 +50,89 @@ export default function HomePage() {
 
   return (
     <div className={styles.siteShell}>
-      <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
-        <button className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA Eats home">
-          <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Eats" className={styles.navLogo} />
+      <style>{`
+        @media (min-width: 821px) {
+          [data-uffda-header] {
+            height: 112px !important;
+            grid-template-columns: 270px 1fr 132px !important;
+            padding: 0 clamp(58px, 4.4vw, 78px) !important;
+            background: linear-gradient(180deg, rgba(2,18,34,.995), rgba(2,18,34,.985)) !important;
+            border-top: 3px solid #0f66cf !important;
+            border-bottom: 1px solid rgba(52,132,210,.72) !important;
+            overflow: visible !important;
+          }
+          [data-uffda-header]::before,
+          [data-uffda-header]::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 165px;
+            height: 74px;
+            pointer-events: none;
+            opacity: .44;
+            background-repeat: no-repeat;
+            background-size: contain;
+            z-index: 0;
+          }
+          [data-uffda-header]::before {
+            left: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 80'%3E%3Cg fill='%230d3c70'%3E%3Cpath d='M24 78h7V45h-7zM27.5 3 9 34h10L5 53h17L8 70h39L33 53h12L34 34h9z'/%3E%3Cpath d='M68 78h6V51h-6zM71 17 57 41h8L54 55h13L57 68h28L75 55h9L76 41h7z' opacity='.75'/%3E%3Cpath d='M112 78h5V58h-5zM114.5 30 103 49h7l-9 12h11l-8 10h22l-8-10h10l-9-12h7z' opacity='.55'/%3E%3C/g%3E%3C/svg%3E");
+          }
+          [data-uffda-header]::after {
+            right: 0;
+            transform: scaleX(-1);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 80'%3E%3Cg fill='%230d3c70'%3E%3Cpath d='M24 78h7V45h-7zM27.5 3 9 34h10L5 53h17L8 70h39L33 53h12L34 34h9z'/%3E%3Cpath d='M68 78h6V51h-6zM71 17 57 41h8L54 55h13L57 68h28L75 55h9L76 41h7z' opacity='.75'/%3E%3Cpath d='M112 78h5V58h-5zM114.5 30 103 49h7l-9 12h11l-8 10h22l-8-10h10l-9-12h7z' opacity='.55'/%3E%3C/g%3E%3C/svg%3E");
+          }
+          [data-uffda-brand] {
+            position: relative;
+            z-index: 3;
+            align-self: stretch;
+            overflow: visible;
+          }
+          [data-uffda-logo] {
+            width: 208px !important;
+            height: 154px !important;
+            object-fit: contain !important;
+            object-position: left top !important;
+            transform: translateY(7px) !important;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,.38)) !important;
+          }
+          [data-uffda-nav] {
+            position: relative;
+            z-index: 2;
+            gap: clamp(52px, 5.1vw, 84px) !important;
+            transform: translateY(-1px);
+          }
+          [data-uffda-nav] button {
+            font-size: 14px !important;
+            letter-spacing: .125em !important;
+            padding-bottom: 19px !important;
+          }
+          [data-uffda-social] {
+            position: relative;
+            z-index: 2;
+            gap: 27px !important;
+            color: #fff;
+          }
+          [data-uffda-social] a:first-child { color: #258df2 !important; }
+          [data-uffda-social] a:last-child { color: #258df2 !important; }
+          [data-uffda-header].${styles.headerScrolled} [data-uffda-logo] {
+            width: 176px !important;
+            height: 126px !important;
+            transform: translateY(4px) !important;
+          }
+        }
+      `}</style>
+      <header data-uffda-header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
+        <button data-uffda-brand className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA Eats home">
+          <img data-uffda-logo src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Eats" className={styles.navLogo} />
         </button>
-        <nav className={styles.desktopNav} aria-label="Primary navigation">
+        <nav data-uffda-nav className={styles.desktopNav} aria-label="Primary navigation">
           {navItems.map(([label, id], index) => (
             <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>{label}</button>
           ))}
         </nav>
-        <div className={styles.socialNav}>
+        <div data-uffda-social className={styles.socialNav}>
           <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={23} /></a>
           <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={20} /></a>
         </div>
