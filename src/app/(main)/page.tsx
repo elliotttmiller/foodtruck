@@ -52,7 +52,7 @@ export default function HomePage() {
     <div className={styles.siteShell}>
       <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
         <button className={styles.brandButton} onClick={() => goTo('home')} aria-label="UFF-DA Eats home">
-          <img src={asset('/brand/uff-da-logo.svg')} alt="UFF-DA Eats" className={styles.navLogo} />
+          <img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Eats" className={styles.navLogo} />
         </button>
         <nav className={styles.desktopNav} aria-label="Primary navigation">
           {navItems.map(([label, id], index) => (
@@ -73,7 +73,7 @@ export default function HomePage() {
             <source media="(max-width: 820px)" srcSet={asset('/brand/hero-uffda-food-mobile.webp')} />
             <img src={asset('/brand/hero-uffda-food.webp')} alt="UFF-DA smash burger, fries, wings, and food truck" className={styles.heroImage} />
           </picture>
-          <img src={asset('/brand/uff-da-logo.svg')} alt="" aria-hidden="true" className={styles.heroBrandGhost} />
+          <img src={asset('/brand/uff-da-logo-white.webp')} alt="" aria-hidden="true" className={styles.heroBrandGhost} />
           <div className={styles.heroShade} />
           <div className={styles.heroContent}>
             <h1>Good Food.<br />Midwest Soul.</h1>
@@ -116,7 +116,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className={styles.footer}><img src={asset('/brand/uff-da-logo.svg')} alt="UFF-DA Eats" /><div>Smash Burgers · Wings · Fries</div><div>© {new Date().getFullYear()} UFF-DA Eats</div></footer>
+      <footer className={styles.footer}><img src={asset('/brand/uff-da-logo-white.webp')} alt="UFF-DA Eats" /><div>Smash Burgers · Wings · Fries</div><div>© {new Date().getFullYear()} UFF-DA Eats</div></footer>
     </div>
   );
 }
