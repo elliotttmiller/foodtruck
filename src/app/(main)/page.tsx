@@ -53,10 +53,10 @@ export default function HomePage() {
       <style>{`
         @media (min-width: 821px) {
           [data-uffda-header] {
-            height: 112px !important;
-            grid-template-columns: 270px 1fr 132px !important;
-            padding: 0 clamp(58px, 4.4vw, 78px) !important;
-            background: linear-gradient(180deg, rgba(2,18,34,.995), rgba(2,18,34,.985)) !important;
+            height: 96px !important;
+            grid-template-columns: 300px 1fr 140px !important;
+            padding: 0 clamp(48px, 4.35vw, 74px) !important;
+            background: #021426 !important;
             border-top: 3px solid #0f66cf !important;
             border-bottom: 1px solid rgba(52,132,210,.72) !important;
             overflow: visible !important;
@@ -66,10 +66,10 @@ export default function HomePage() {
             content: '';
             position: absolute;
             bottom: 0;
-            width: 165px;
-            height: 74px;
+            width: 130px;
+            height: 62px;
             pointer-events: none;
-            opacity: .44;
+            opacity: .30;
             background-repeat: no-repeat;
             background-size: contain;
             z-index: 0;
@@ -86,21 +86,30 @@ export default function HomePage() {
           [data-uffda-brand] {
             position: relative;
             z-index: 3;
+            justify-self: start;
             align-self: stretch;
+            width: 224px;
+            height: 96px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
             overflow: visible;
           }
           [data-uffda-logo] {
-            width: 208px !important;
-            height: 154px !important;
+            position: absolute;
+            top: 5px;
+            left: 0;
+            width: 166px !important;
+            height: 120px !important;
             object-fit: contain !important;
-            object-position: left top !important;
-            transform: translateY(7px) !important;
-            filter: drop-shadow(0 8px 12px rgba(0,0,0,.38)) !important;
+            object-position: center top !important;
+            transform: none !important;
+            filter: drop-shadow(0 5px 9px rgba(0,0,0,.38)) !important;
           }
           [data-uffda-nav] {
             position: relative;
             z-index: 2;
-            gap: clamp(52px, 5.1vw, 84px) !important;
+            gap: clamp(52px, 5vw, 82px) !important;
             transform: translateY(-1px);
           }
           [data-uffda-nav] button {
@@ -112,14 +121,18 @@ export default function HomePage() {
             position: relative;
             z-index: 2;
             gap: 27px !important;
-            color: #fff;
           }
-          [data-uffda-social] a:first-child { color: #258df2 !important; }
-          [data-uffda-social] a:last-child { color: #258df2 !important; }
+          [data-uffda-social] a { color: #258df2 !important; }
+          [data-uffda-header].${styles.headerScrolled} {
+            height: 96px !important;
+          }
           [data-uffda-header].${styles.headerScrolled} [data-uffda-logo] {
-            width: 176px !important;
-            height: 126px !important;
-            transform: translateY(4px) !important;
+            top: 5px;
+            width: 166px !important;
+            height: 120px !important;
+          }
+          [data-uffda-header].${styles.headerScrolled} [data-uffda-brand] {
+            height: 96px;
           }
         }
       `}</style>
