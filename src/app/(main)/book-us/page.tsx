@@ -6,7 +6,8 @@ import { ArrowRight, CalendarDays, CheckCircle2, Facebook, Instagram, Mail, MapP
 import { siteConfig } from '@/config/site';
 import styles from './booking.module.css';
 
-const asset = (path: string) => `/${path.replace(/^\//, '')}`;
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH?.replace(/\/$/, '') ?? '';
+const asset = (path: string) => `${basePath}/${path.replace(/^\//, '')}`;
 
 const eventTypes = ['Private Party', 'Corporate Event', 'Wedding', 'Community Event', 'School / Sports Event', 'Festival', 'Other'];
 
