@@ -26,6 +26,17 @@ const features = [
   { title: 'Midwest Proud', copy: 'Local at heart. Serving Minnesota with pride.', Icon: MinnesotaIcon },
 ];
 
+const mobileBookLinkStyle = {
+  color: '#fff',
+  textDecoration: 'none',
+  textAlign: 'left' as const,
+  padding: '15px 4px',
+  textTransform: 'uppercase' as const,
+  fontWeight: 800,
+  letterSpacing: '.1em',
+  borderBottom: '1px solid rgba(73,132,186,.24)',
+};
+
 export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -131,7 +142,7 @@ export default function HomePage() {
           {navItems.map(([label, id], index) => (
             <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>{label}</button>
           ))}
-          <Link href="/book-us" className={styles.navLink}>Book Us</Link>
+          <Link href="/book-us" className={styles.navLink} style={{ textDecoration: 'none' }}>Book Us</Link>
         </nav>
         <div data-uffda-social className={styles.socialNav}>
           <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={23} /></a>
@@ -141,7 +152,7 @@ export default function HomePage() {
         {mobileOpen && (
           <nav className={styles.mobileNav} aria-label="Mobile navigation">
             {navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}
-            <Link href="/book-us" onClick={() => setMobileOpen(false)}>Book Us</Link>
+            <Link href="/book-us" onClick={() => setMobileOpen(false)} style={mobileBookLinkStyle}>Book Us</Link>
           </nav>
         )}
       </header>
@@ -158,7 +169,7 @@ export default function HomePage() {
             <h1>Good Food.<br />Midwest Soul.</h1>
             <div className={styles.redRule}><span /></div>
             <p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p>
-            <Link className={styles.primaryCta} href="/book-us">Book UFF-DA <ArrowRight size={20} strokeWidth={2} /></Link>
+            <Link className={styles.primaryCta} href="/book-us" style={{ textDecoration: 'none' }}>Book UFF-DA <ArrowRight size={20} strokeWidth={2} /></Link>
           </div>
         </section>
 
