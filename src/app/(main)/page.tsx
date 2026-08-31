@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Facebook, Instagram, Menu, X } from 'lucide-react';
 import { siteConfig } from '@/config/site';
@@ -10,7 +11,6 @@ const asset = (path: string) => path.replace(/^\//, '');
 const navItems = [
   ['Home', 'home'],
   ['Our Story', 'story'],
-  ['Menu', 'menu'],
   ['Find Us', 'find-us'],
 ] as const;
 
@@ -26,11 +26,16 @@ const features = [
   { title: 'Midwest Proud', copy: 'Local at heart. Serving Minnesota with pride.', Icon: MinnesotaIcon },
 ];
 
-const menuItems = [
-  { title: 'Smash Burgers', copy: 'Thin patties smashed hard on the griddle for lacey, caramelized edges and a juicy center. Built with melty cheese, pickles, onion, and craveable house sauces.', image: '/brand/menu-smash-burger.webp', crop: styles.menuBurger, alt: 'UFF-DA smash burger with melted cheese, pickles, onion, and house sauce' },
-  { title: 'Wings', copy: 'Built around our handcrafted, one-of-a-kind dry rubs—original seasoning blends developed in-house to bring flavors you won’t find just anywhere. Or go sauced, with bold options from savory and smoky to sweet, tangy, and hot. Crisp outside, juicy inside, and packed with UFF-DA flavor.', image: '/brand/menu-wings.webp', crop: styles.menuWings, alt: 'UFF-DA chicken wings' },
-  { title: 'Fries', copy: 'Hot, crispy fries served as a simple, craveable side that pairs with the burgers and wings.', image: '/brand/menu-fries.webp', crop: styles.menuFries, alt: 'UFF-DA hot crispy fries' },
-];
+const mobileBookLinkStyle = {
+  color: '#fff',
+  textDecoration: 'none',
+  textAlign: 'left' as const,
+  padding: '15px 4px',
+  textTransform: 'uppercase' as const,
+  fontWeight: 800,
+  letterSpacing: '.1em',
+  borderBottom: '1px solid rgba(73,132,186,.24)',
+};
 
 export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -109,10 +114,11 @@ export default function HomePage() {
           [data-uffda-nav] {
             position: relative;
             z-index: 2;
-            gap: clamp(52px, 5vw, 82px) !important;
+            gap: clamp(42px, 4.25vw, 70px) !important;
             transform: translateY(-1px);
           }
-          [data-uffda-nav] button {
+          [data-uffda-nav] button,
+          [data-uffda-nav] a {
             font-size: 14px !important;
             letter-spacing: .125em !important;
             padding-bottom: 19px !important;
@@ -123,17 +129,9 @@ export default function HomePage() {
             gap: 27px !important;
           }
           [data-uffda-social] a { color: #258df2 !important; }
-          [data-uffda-header].${styles.headerScrolled} {
-            height: 96px !important;
-          }
-          [data-uffda-header].${styles.headerScrolled} [data-uffda-logo] {
-            top: 5px;
-            width: 166px !important;
-            height: 120px !important;
-          }
-          [data-uffda-header].${styles.headerScrolled} [data-uffda-brand] {
-            height: 96px;
-          }
+          [data-uffda-header].${styles.headerScrolled} { height: 96px !important; }
+          [data-uffda-header].${styles.headerScrolled} [data-uffda-logo] { top: 5px; width: 166px !important; height: 120px !important; }
+          [data-uffda-header].${styles.headerScrolled} [data-uffda-brand] { height: 96px; }
         }
       `}</style>
       <header data-uffda-header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
@@ -144,13 +142,19 @@ export default function HomePage() {
           {navItems.map(([label, id], index) => (
             <button key={id} onClick={() => goTo(id)} className={`${styles.navLink} ${index === 0 ? styles.activeNav : ''}`}>{label}</button>
           ))}
+          <Link href="/book-us" className={styles.navLink} style={{ textDecoration: 'none' }}>Book Us</Link>
         </nav>
         <div data-uffda-social className={styles.socialNav}>
           <a href={siteConfig.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={23} /></a>
           <a href={siteConfig.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={20} /></a>
         </div>
         <button className={styles.mobileToggle} onClick={() => setMobileOpen(v => !v)} aria-label="Toggle navigation" aria-expanded={mobileOpen}>{mobileOpen ? <X size={28} /> : <Menu size={28} />}</button>
-        {mobileOpen && <nav className={styles.mobileNav} aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}</nav>}
+        {mobileOpen && (
+          <nav className={styles.mobileNav} aria-label="Mobile navigation">
+            {navItems.map(([label, id]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}
+            <Link href="/book-us" onClick={() => setMobileOpen(false)} style={mobileBookLinkStyle}>Book Us</Link>
+          </nav>
+        )}
       </header>
 
       <main>
@@ -165,7 +169,7 @@ export default function HomePage() {
             <h1>Good Food.<br />Midwest Soul.</h1>
             <div className={styles.redRule}><span /></div>
             <p>Smash burgers, bold wings, and crispy fries<br className={styles.desktopBreak} /> made with real ingredients and big flavor.</p>
-            <button className={styles.primaryCta} onClick={() => goTo('menu')}>View Menu <ArrowRight size={20} strokeWidth={2} /></button>
+            <Link className={styles.primaryCta} href="/book-us" style={{ textDecoration: 'none' }}>Book UFF-DA <ArrowRight size={20} strokeWidth={2} /></Link>
           </div>
         </section>
 
@@ -189,11 +193,6 @@ export default function HomePage() {
               <article className={styles.storyDetail}><span>The UFF-DA standard</span><p>Every item is about taking something familiar and making it worth coming back for. Keep it straightforward, do it well, and serve seriously good food with flavors you won’t find just anywhere.</p></article>
             </div>
           </div>
-        </section>
-
-        <section id="menu" className={styles.menuSection}>
-          <div className={styles.sectionHeading}><span>The Menu</span><h2>Three things. Done right.</h2></div>
-          <div className={styles.menuGrid}>{menuItems.map(item => <article key={item.title}><div className={styles.menuPhoto}><img src={asset(item.image)} alt={item.alt} className={item.crop} loading="lazy" /></div><div className={styles.menuCopy}><h3>{item.title}</h3><p>{item.copy}</p></div></article>)}</div>
         </section>
 
         <section id="find-us" className={styles.findSection}>

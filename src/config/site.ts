@@ -26,9 +26,9 @@ export const siteConfig = {
     .split(',')
     .map((value) => value.trim())
     .filter(Boolean),
-  phoneE164: env('NEXT_PUBLIC_PHONE_E164', ''),
-  phoneDisplay: env('NEXT_PUBLIC_PHONE_DISPLAY', ''),
-  emailContact: env('NEXT_PUBLIC_EMAIL_CONTACT', ''),
+  phoneE164: env('NEXT_PUBLIC_PHONE_E164', '+13207779642'),
+  phoneDisplay: env('NEXT_PUBLIC_PHONE_DISPLAY', '320-777-9642'),
+  emailContact: env('NEXT_PUBLIC_EMAIL_CONTACT', 'uffdaeatsmn@gmail.com'),
   addressLine: env('NEXT_PUBLIC_ADDRESS_LINE', ''),
   addressCity: env('NEXT_PUBLIC_ADDRESS_CITY', ''),
   addressRegion: env('NEXT_PUBLIC_ADDRESS_REGION', 'MN'),
@@ -55,8 +55,8 @@ export const siteConfig = {
     .map((value) => value.trim())
     .filter(Boolean),
   social: {
-    instagram: env('NEXT_PUBLIC_SOCIAL_INSTAGRAM', ''),
-    facebook: env('NEXT_PUBLIC_SOCIAL_FACEBOOK', ''),
+    instagram: env('NEXT_PUBLIC_SOCIAL_INSTAGRAM', 'https://www.instagram.com/uffdaeatsmn'),
+    facebook: env('NEXT_PUBLIC_SOCIAL_FACEBOOK', 'https://www.facebook.com/uffdaeats'),
   },
   themeColor: env('NEXT_PUBLIC_THEME_COLOR', '#020202'),
 };
