@@ -1,137 +1,86 @@
-# Food Truck Command Center
+# Uff-Da Eats Command Center
 
-Standalone PWA command center for managing a food truck business outside of the public website architecture.
+A local-first, installable food-truck operations PWA. The app intentionally remains a static application: no server, framework build chain, or external database is required for single-device operation.
 
-This tool is intentionally isolated from the existing customer-facing website. It lives inside `/command-center/` and can be opened locally through a static web server or deployed later as its own static app.
+## Primary workflow
 
-## How to Run Locally
+1. Configure every ingredient and packaging input in **Cost Library** with purchase quantity, unit, price, and effective date.
+2. Open **Daily Profit** after service.
+3. Enter gross sales, sales tax, discounts/refunds, labor, processing fees, direct costs, overhead, and exact measured usage.
+4. Review the live operating-profit calculation.
+5. Save the service day. The report stores immutable cost snapshots, so later price changes cannot alter historical profitability.
 
-Do not open `index.html` directly by double-clicking it. Because this is a PWA with a service worker, it should be served through a local web server.
+## Financial correctness
 
-### Option 1: Run with Python
+- Currency inputs are converted to integer cents.
+- Ingredient usage uses rational decimal/unit arithmetic in `core.js` rather than floating-point currency math.
+- Sales tax collected is excluded from net operating revenue.
+- Food, packaging, labor, processing, direct expenses, and allocated overhead are separated.
+- Ingredient price changes are effective-dated.
+- Finalized daily reports retain the purchase-cost basis used when saved.
+- Waste and complimentary/staff usage are separated from sold usage but remain part of total consumed cost.
 
-From the root of the repo:
+A result is only as exact as the measurements and source costs entered. The application avoids claiming precision beyond the provided data.
+
+## App areas
+
+- Dashboard
+- Daily Profit
+- Cost Library
+- Reports
+- Sales
+- Events & Catering
+- CRM
+- Inventory
+- Menu Costing
+- Purchases
+- Labor
+- Expenses
+- Vendors
+- Settings / backup / restore
+
+## Run locally
+
+From the repository root:
 
 ```bash
 cd command-center
 python3 -m http.server 5174
 ```
 
-Then open this address in your browser:
+Open `http://localhost:5174`.
 
-```txt
-http://localhost:5174
-```
+## Tests
 
-### Option 2: Run with Node / npx
-
-From the root of the repo:
+From the repository root:
 
 ```bash
-npx serve command-center
+node --test command-center/tests/finance.test.mjs
 ```
 
-Then open the local address shown in the terminal. It will usually look similar to:
+The finance tests cover deterministic currency rounding, weight conversion, incompatible-unit rejection, tax exclusion, and complete daily-profit composition.
 
-```txt
-http://localhost:3000
-```
+## Persistence and backup
 
-### Option 3: Use VS Code Live Server
+Production records are stored in browser `localStorage` under schema v3 and synchronized between open tabs with `BroadcastChannel`. Use **Backup** regularly to export a complete JSON copy. Restore is available in Settings.
 
-1. Open the repo in VS Code.
-2. Install the Live Server extension if it is not already installed.
-3. Right-click `command-center/index.html`.
-4. Select **Open with Live Server**.
+This storage model is deliberately appropriate for a single-owner/single-device workflow. A server database and authentication should only be introduced when multi-user or cross-device requirements become real; adding them earlier would increase operational complexity without improving the core calculation workflow.
 
-## What You Should See
+## Structure
 
-When the app opens, you should see the **Food Truck Command Center** dashboard with a left-side navigation menu.
-
-Main sections include:
-
-- Dashboard
-- Sales Tracker
-- CRM
-- Events & Catering
-- Inventory
-- Menu Costing
-- Purchases
-- Vendors
-- Labor
-- Expenses
-- Reports
-- QuickBooks export preparation
-- Settings
-
-## Current MVP Scope
-
-The first implementation includes:
-
-- Dashboard with owner-friendly KPIs
-- Sales tracker
-- CRM for customers, catering leads, and event contacts
-- Events and catering pipeline
-- Inventory with reorder alerts
-- Menu costing and margin watch
-- Purchases log
-- Vendor manager
-- Labor tracker
-- Expense tracker
-- Reports and CSV exports
-- QuickBooks-ready export center
-- JSON backup/restore
-- Offline-capable PWA shell
-- Install prompt support where supported by the browser
-
-## Storage Model
-
-The current MVP stores records in the browser using `localStorage`.
-
-That means records are saved to the browser/device you are using. This is suitable for early business modeling, daily workflow testing, and single-device use. It is not a final multi-user database.
-
-Before using this as a team-wide production system, migrate the data layer to a backend such as Supabase, Firebase, SQLite/Postgres, or another secure persistence layer.
-
-## Backup and Restore
-
-Inside the app, use:
-
-- **Backup Data** to download a JSON backup of all local records.
-- **Restore Backup** in Settings to reload a saved JSON backup.
-- CSV export buttons to export individual sections for accounting, reporting, or spreadsheet review.
-
-## QuickBooks Boundary
-
-The browser PWA does not directly connect to QuickBooks Online because Intuit OAuth credentials and refresh tokens must not be stored in public frontend code.
-
-The app is structured to prepare QuickBooks-ready data through clean CSV exports and status fields. A full integration should be added later through a backend connector that handles:
-
-- Intuit OAuth 2.0 authorization
-- Realm/company ID handling
-- Secure token storage
-- Refresh-token rotation
-- Sales, expense, vendor, and customer mapping
-- Sync logs and retry handling
-- Manual review before records are pushed to QuickBooks
-
-## File Structure
-
-```txt
+```text
 command-center/
   index.html
   styles.css
-  app.js
-  manifest.webmanifest
+  app.js            # UI, state, CRUD and workflows
+  core.js           # deterministic finance/unit engine
   service-worker.js
+  manifest.webmanifest
+  tests/
+    finance.test.mjs
   README.md
 ```
 
-## Future Build Phases
+## Design system
 
-1. Replace localStorage with a real database.
-2. Add user authentication and staff roles.
-3. Add receipt/photo upload support.
-4. Add true QuickBooks backend sync.
-5. Add POS import from Square/Toast/Clover exports.
-6. Add mobile-first daily prep checklist.
-7. Add inventory depletion based on menu-item sales and recipes.
+The UI uses a restrained neutral system with a dark command rail, white operational surfaces, compact typography, responsive table/list layouts, strong financial hierarchy, subtle hover/reveal motion, visible keyboard focus states, sticky profit summaries, and `prefers-reduced-motion` support. No external fonts or UI libraries are required, preserving offline operation and fast startup.
