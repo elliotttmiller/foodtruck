@@ -41,6 +41,28 @@ function loadInitialState() {
   return emptyState();
 }
 
+function saveState(normalized) {
+  const serialized = JSON.stringify(normalized);
+  try {
+    localStorage.setItem(STORE_KEY, serialized);
+    return true;
+  } catch (error) {
+    if (error?.name !== 'QuotaExceededError') {
+      console.warn('Unable to save command center state.', error);
+      return false;
+    }
+  }
+
+  try {
+    LEGACY_KEYS.forEach(key => localStorage.removeItem(key));
+    localStorage.setItem(STORE_KEY, serialized);
+    return true;
+  } catch (error) {
+    console.warn('Browser storage is full; keeping command center changes in memory for this session.', error);
+    return false;
+  }
+}
+
 const StoreContext = createContext(null);
 
 export function AppStoreProvider({ children }) {
@@ -51,7 +73,7 @@ export function AppStoreProvider({ children }) {
 
   const persist = useCallback((next, announce = true) => {
     const normalized = normalizeState(next);
-    localStorage.setItem(STORE_KEY, JSON.stringify(normalized));
+    saveState(normalized);
     if (announce) channelRef.current?.postMessage({ clientId:CLIENT_ID, state:normalized });
     return normalized;
   }, []);
