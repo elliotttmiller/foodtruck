@@ -1,0 +1,135 @@
+export const SCHEMA_VERSION = 3;
+
+export const UNIT_DEFS = Object.freeze({
+  each: { dimension: 'count', factor: 1, label: 'each' },
+  oz: { dimension: 'weight', factor: 1, label: 'oz' },
+  lb: { dimension: 'weight', factor: 16, label: 'lb' },
+  floz: { dimension: 'volume', factor: 1, label: 'fl oz' },
+  cup: { dimension: 'volume', factor: 8, label: 'cup' },
+  pint: { dimension: 'volume', factor: 16, label: 'pint' },
+  quart: { dimension: 'volume', factor: 32, label: 'quart' },
+  gallon: { dimension: 'volume', factor: 128, label: 'gallon' },
+});
+
+const pow10 = n => 10n ** BigInt(n);
+
+export function parseDecimal(value) {
+  const text = String(value ?? '').trim();
+  if (!text) return { num: 0n, scale: 0 };
+  if (!/^-?\d+(?:\.\d+)?$/.test(text)) throw new Error(`Invalid decimal: ${text}`);
+  const negative = text.startsWith('-');
+  const clean = negative ? text.slice(1) : text;
+  const [whole, fraction = ''] = clean.split('.');
+  const num = BigInt(`${whole}${fraction}` || '0') * (negative ? -1n : 1n);
+  return { num, scale: fraction.length };
+}
+
+export function roundFraction(num, den) {
+  if (den === 0n) throw new Error('Division by zero');
+  const negative = (num < 0n) !== (den < 0n);
+  let n = num < 0n ? -num : num;
+  let d = den < 0n ? -den : den;
+  const q = n / d;
+  const r = n % d;
+  const rounded = r * 2n >= d ? q + 1n : q;
+  return Number(negative ? -rounded : rounded);
+}
+
+export function dollarsToCents(value) {
+  const { num, scale } = parseDecimal(value);
+  return roundFraction(num * 100n, pow10(scale));
+}
+
+export function centsToDollars(cents) {
+  return Number(cents || 0) / 100;
+}
+
+export function formatMoney(cents, currency = 'USD') {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(centsToDollars(cents));
+}
+
+export function unitCompatible(a, b) {
+  return Boolean(UNIT_DEFS[a] && UNIT_DEFS[b] && UNIT_DEFS[a].dimension === UNIT_DEFS[b].dimension);
+}
+
+export function toBaseQuantity(value, unit) {
+  const def = UNIT_DEFS[unit];
+  if (!def) throw new Error(`Unsupported unit: ${unit}`);
+  const { num, scale } = parseDecimal(value);
+  const factor = parseDecimal(def.factor);
+  return { num: num * factor.num, den: pow10(scale + factor.scale) };
+}
+
+export function ingredientCostCents(ingredient, quantity, usageUnit) {
+  if (!ingredient) throw new Error('Ingredient is required');
+  const purchaseUnit = ingredient.purchaseUnit;
+  if (!unitCompatible(purchaseUnit, usageUnit)) throw new Error(`Incompatible units: ${purchaseUnit} and ${usageUnit}`);
+
+  const purchaseQty = toBaseQuantity(ingredient.purchaseQuantity, purchaseUnit);
+  const usedQty = toBaseQuantity(quantity, usageUnit);
+  const purchaseCents = BigInt(Number(ingredient.purchaseCostCents || 0));
+  if (purchaseQty.num <= 0n || purchaseCents < 0n) throw new Error('Invalid ingredient cost basis');
+
+  const num = purchaseCents * usedQty.num * purchaseQty.den;
+  const den = usedQty.den * purchaseQty.num;
+  return roundFraction(num, den);
+}
+
+export function costPerBaseUnitMicros(ingredient) {
+  const purchaseQty = toBaseQuantity(ingredient.purchaseQuantity, ingredient.purchaseUnit);
+  const cents = BigInt(Number(ingredient.purchaseCostCents || 0));
+  if (purchaseQty.num <= 0n) return 0;
+  return roundFraction(cents * 1_000_000n * purchaseQty.den, purchaseQty.num);
+}
+
+export function netSalesCents({ grossSalesCents = 0, discountsCents = 0, refundsCents = 0, salesTaxCents = 0 } = {}) {
+  return Number(grossSalesCents) - Number(discountsCents) - Number(refundsCents) - Number(salesTaxCents);
+}
+
+export function buildUsageSnapshot(ingredient, usage) {
+  const soldCostCents = ingredientCostCents(ingredient, usage.soldQty || 0, usage.unit);
+  const wasteCostCents = ingredientCostCents(ingredient, usage.wasteQty || 0, usage.unit);
+  const compCostCents = ingredientCostCents(ingredient, usage.compQty || 0, usage.unit);
+  const totalCostCents = soldCostCents + wasteCostCents + compCostCents;
+  return {
+    ingredientId: ingredient.id,
+    name: ingredient.name,
+    category: ingredient.category,
+    unit: usage.unit,
+    soldQty: String(usage.soldQty || 0),
+    wasteQty: String(usage.wasteQty || 0),
+    compQty: String(usage.compQty || 0),
+    purchaseQuantitySnapshot: String(ingredient.purchaseQuantity),
+    purchaseUnitSnapshot: ingredient.purchaseUnit,
+    purchaseCostCentsSnapshot: Number(ingredient.purchaseCostCents),
+    effectiveDateSnapshot: ingredient.effectiveDate || null,
+    soldCostCents,
+    wasteCostCents,
+    compCostCents,
+    totalCostCents,
+  };
+}
+
+export function calculateDailyReport(input) {
+  const usages = input.usages || [];
+  const ingredientCostCents = usages.reduce((sum, row) => sum + Number(row.totalCostCents || 0), 0);
+  const packagingCostCents = usages.filter(row => row.category === 'Packaging').reduce((sum, row) => sum + Number(row.totalCostCents || 0), 0);
+  const foodCostCents = ingredientCostCents - packagingCostCents;
+  const laborCostCents = Number(input.laborCostCents || 0);
+  const processingFeesCents = Number(input.processingFeesCents || 0);
+  const directExpensesCents = Number(input.directExpensesCents || 0);
+  const allocatedOverheadCents = Number(input.allocatedOverheadCents || 0);
+  const revenueCents = netSalesCents(input);
+  const totalCostCents = ingredientCostCents + laborCostCents + processingFeesCents + directExpensesCents + allocatedOverheadCents;
+  const operatingProfitCents = revenueCents - totalCostCents;
+  const grossProfitCents = revenueCents - ingredientCostCents;
+  const marginPct = revenueCents ? (operatingProfitCents / revenueCents) * 100 : 0;
+  const foodCostPct = revenueCents ? (foodCostCents / revenueCents) * 100 : 0;
+  return { revenueCents, foodCostCents, packagingCostCents, ingredientCostCents, laborCostCents, processingFeesCents, directExpensesCents, allocatedOverheadCents, totalCostCents, grossProfitCents, operatingProfitCents, marginPct, foodCostPct };
+}
+
+export function activeCostForDate(costHistory = [], date) {
+  return [...costHistory]
+    .filter(row => row.effectiveDate <= date)
+    .sort((a, b) => b.effectiveDate.localeCompare(a.effectiveDate))[0] || null;
+}
