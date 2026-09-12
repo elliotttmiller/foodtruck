@@ -42,3 +42,5 @@
 @keyframes live-refresh-spin{to{transform:rotate(360deg)}}
 @media(max-width:760px){.live-tools{justify-content:flex-end}}
 @media(prefers-reduced-motion:reduce){.live-icon-tool .is-spinning{animation:none}}
+@media(min-width:901px){.live-lanes{transition:margin-right .42s cubic-bezier(.22,1,.36,1)}.live-board:has(.timer-panel.is-open) .live-lanes{margin-right:410px}}
+@media(prefers-reduced-motion:reduce){.live-lanes{transition:none}}

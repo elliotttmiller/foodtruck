@@ -63,12 +63,8 @@ export function KitchenTimers() {
   useEffect(() => {
     if (!open) return;
     const onKeyDown = event => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); } };
-    const onPointerDown = event => {
-      if (!panelRef.current?.contains(event.target) && !toggleRef.current?.contains(event.target)) setOpen(false);
-    };
     document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => { document.removeEventListener('keydown', onKeyDown); document.removeEventListener('pointerdown', onPointerDown); };
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
   useEffect(() => {
