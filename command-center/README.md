@@ -42,7 +42,7 @@ npm run check
 npm run build
 ```
 
-The production bundle is emitted to `command-center/dist/` and can be hosted from any static origin.
+The production bundle is emitted to the repository-level `docs/` directory for GitHub Pages.
 
 ## Source structure
 
