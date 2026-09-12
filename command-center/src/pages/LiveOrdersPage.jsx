@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, BookOpen, X } from 'lucide-react';
+import { AlertTriangle, BookOpen, RefreshCw, X } from 'lucide-react';
 import { MenuQuickReference } from '../components/MenuQuickReference.jsx';
 import { KitchenTimers } from '../components/KitchenTimers.jsx';
-import { clearLiveSession, ensureSession, fetchLiveOrders, loadLiveSession, requestSquareSync, setOrderStatus, signInStaff, signOutStaff, staffStatus, subscribeToOrders } from '../lib/liveOrders.js';
+import { clearLiveSession, ensureSession, fetchLiveOrders, loadLiveSession, requestSquareSync, setOrderStatus, signInStaff, staffStatus, subscribeToOrders } from '../lib/liveOrders.js';
 
 function elapsed(from){if(!from)return'--:--';const sec=Math.max(0,Math.floor((Date.now()-new Date(from).getTime())/1000));const m=Math.floor(sec/60);return`${m}:${String(sec%60).padStart(2,'0')}`;}
 function urgency(order){const age=(Date.now()-new Date(order.source_created_at||order.created_at).getTime())/60000;return age>=8?'overdue':age>=5?'warning':'';}
@@ -53,7 +53,6 @@ export function LiveOrdersPage(){
   const login=async event=>{event.preventDefault();setError('');try{const fresh=await signInStaff(username,password);setPassword('');setSession(fresh);await load(fresh.accessToken);}catch(err){setError(err.message);}};
   const move=async(order,status)=>{setBusyId(order.id);setError('');try{await setOrderStatus(session.accessToken,order.id,status,order.status);setSelectedId(null);await load(session.accessToken);}catch(err){await load(session.accessToken);setError(err.message);}finally{setBusyId('');}};
   const sync=async()=>{setSyncing(true);setError('');try{await requestSquareSync(session.accessToken);await load(session.accessToken);}catch(err){setError(err.message);}finally{setSyncing(false);}};
-  const logout=()=>{const current=session;setSession(null);setAuthorized(false);setOrders([]);clearLiveSession();if(current)signOutStaff(current).catch(()=>{});};
 
   const active=useMemo(()=>orders.filter(o=>o.status==='active'),[orders]);
   const ready=useMemo(()=>orders.filter(o=>o.status==='ready'),[orders]);
@@ -68,7 +67,7 @@ export function LiveOrdersPage(){
     <header className="live-header">
       <div className="live-brand"><img className="live-logo" src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><div className="live-brand-copy"><h1>LIVE ORDERS</h1><span>{serviceDate.format(new Date())}</span></div></div>
       <div className={`live-connection ${connection}`} role="status" aria-live="polite"><span className="status-dot"/><div><strong>{connection==='connected'?'Realtime connected':connection==='offline'?'Offline — use backup tickets':'Reconnecting'}</strong><span>{lastUpdated?`Database updated ${elapsed(lastUpdated)} ago`:'Waiting for database update'}</span></div></div>
-      <div className="live-tools"><KitchenTimers/><button type="button" className="live-quiet live-menu-trigger" aria-label="Open menu quick view" title="Menu quick view" onClick={()=>setMenuOpen(true)}><BookOpen size={18} aria-hidden="true"/></button><button type="button" className="live-quiet" onClick={sync} disabled={syncing}><span>{syncing?'Syncing…':'Refresh from Square'}</span></button><button type="button" className="live-quiet live-exit" onClick={logout}><span>Lock</span></button></div>
+      <div className="live-tools"><button type="button" className="live-quiet live-icon-tool" onClick={sync} disabled={syncing} aria-label={syncing?'Refreshing from Square':'Refresh from Square'} title={syncing?'Refreshing from Square':'Refresh from Square'}><RefreshCw size={18} aria-hidden="true" className={syncing?'is-spinning':''}/></button><button type="button" className="live-quiet live-icon-tool" aria-label="Open menu quick view" title="Menu quick view" onClick={()=>setMenuOpen(true)}><BookOpen size={18} aria-hidden="true"/></button><KitchenTimers/></div>
     </header>
     {error?<div className="live-banner error" role="alert"><AlertTriangle size={17}/><span>{error}</span></div>:null}
     <div className="live-lanes">
