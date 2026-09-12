@@ -1,0 +1,51 @@
+name: Build Command Center
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'command-center/**'
+      - '.github/workflows/build-command-center.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: command-center-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: command-center/package-lock.json
+      - name: Install
+        working-directory: command-center
+        run: npm ci
+      - name: Test
+        working-directory: command-center
+        run: npm test
+      - name: Build
+        working-directory: command-center
+        run: npm run build
+      - name: Commit generated Pages build
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "Build command center"
+          git push
