@@ -1,90 +1,35 @@
-# UFF-DA Food Truck
+# UFF-DA Eats Command Center
 
-Production repository for the UFF-DA Minnesota food-truck brand and marketing website.
+The active application is the Vite operations dashboard in [`command-center/`](command-center/). Its Live Orders screen receives Square sales through Supabase Edge Functions; Square credentials remain server-side.
 
-## Repository architecture
+## Working directories
 
-### `src/` — production website frontend
-The active public-facing website is a focused Next.js marketing site.
+| Directory | Purpose |
+| --- | --- |
+| `command-center/` | Active dashboard source, tests, public assets, local Vite configuration |
+| `supabase/` | Live Orders database migrations and Square Edge Functions |
+| `docs/` | Committed GitHub Pages output: Command Center plus a root redirect |
+| `website/` | Archived independent Next.js website source and assets |
 
-Primary frontend files:
-- `src/app/(main)/page.tsx` — UFF-DA landing page
-- `src/app/(main)/uffda.module.css` — UFF-DA page design system
-- `src/app/layout.tsx` — root document and metadata
-- `src/app/globals.css` — global styles
-- `src/config/site.ts` — public brand/site configuration
-
-### `public/` — production web assets
-Contains UFF-DA brand assets used by the production frontend. The canonical website logo is `public/brand/uff-da-logo.png`.
-
-### `command-center/` — internal operations
-The command center is intentionally isolated from the production Next.js frontend.
-
-### `docs/` — GitHub Pages deployment bundle
-`docs/` contains the generated static website that GitHub Pages publishes. Do not hand-edit this directory. Running `npm run build` replaces it from the fresh Next.js static export.
-
-## Development
+Run the active app locally:
 
 ```bash
-npm install
+cd command-center
+npm ci
 npm run dev
 ```
 
-## Production build
+Test and build the Pages bundle:
 
 ```bash
-npm run build
+cd command-center
+npm run check
 ```
 
-The build performs two stages:
+The build writes to `docs/command-center/`. GitHub Pages publishes `main:/docs` at [Live Orders](https://elliotttmiller.github.io/foodtruck/command-center/#/live-orders). The project root redirects there. `.github/workflows/build-command-center.yml` validates Command Center changes and commits updated static output on pushes to `main`.
 
-1. `next build` creates a static export in the ignored `out/` working directory.
-2. `scripts/prepare-github-pages.mjs` replaces `docs/` with that export and creates `docs/.nojekyll` so GitHub serves the `_next` assets correctly.
+To preview the actual ticket layout without credentials or a real sale, open [Live Orders preview](https://elliotttmiller.github.io/foodtruck/command-center/#/live-orders-demo). Sample tickets are browser-only: use **Add test order**, **Ready**, and **Complete** to rehearse the workflow. Exit preview to return to authenticated live orders. This does not verify the Square integration.
 
-`.next/` and `out/` are intentionally ignored. `docs/` is intentionally tracked because it is the GitHub Pages publishing source.
+Set Square production tokens and webhook keys in **Supabase Edge Function Secrets**. See [the Live Orders runbook](command-center/LIVE_ORDERS_TRIAL.md) and [the environment setup reference](.env.example). `command-center/.env.example` is solely for public local Vite values. Do not put secrets in the repository.
 
-## GitHub Pages
-
-This repository is configured as a GitHub **project Pages** site at:
-
-`https://elliotttmiller.github.io/foodtruck/`
-
-In GitHub, configure:
-
-**Settings → Pages → Build and deployment → Deploy from a branch**
-
-- Branch: `main`
-- Folder: `/docs`
-
-Then the normal release flow is:
-
-```bash
-git pull origin main
-npm install
-npm run build
-git add docs
-git commit -m "Build GitHub Pages site"
-git push origin main
-```
-
-A push containing changed files under `docs/` triggers GitHub Pages publication from `main:/docs`.
-
-## GitHub Pages path configuration
-
-`.env.production` currently defines:
-
-```env
-NEXT_PUBLIC_BASE_PATH=/foodtruck
-NEXT_PUBLIC_SITE_URL=https://elliotttmiller.github.io/foodtruck
-```
-
-This ensures Next.js application assets and UFF-DA brand assets resolve correctly under the repository subpath. If the site later moves to a custom root domain, set `NEXT_PUBLIC_BASE_PATH` to an empty value and update `NEXT_PUBLIC_SITE_URL`, then rebuild.
-
-## Architecture rules
-
-1. `src/` is reserved for the active UFF-DA public frontend.
-2. Internal operational tooling belongs under `command-center/`.
-3. Do not reintroduce the former restaurant template, ordering flows, authentication, payment integrations, or tracking application unless product scope explicitly changes.
-4. Keep `public/` limited to active UFF-DA assets.
-5. Never commit `.next/` or `out/`.
-6. Never hand-edit generated files in `docs/`; regenerate them with `npm run build`.
+The original marketing site remains available as source in [`website/`](website/). Run `npm ci` and `npm run dev` inside `website/` to work on it independently. Its `npm run build` writes to `website/out/` and never touches the Command Center deployment.

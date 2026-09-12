@@ -10,19 +10,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Next.js working/build directories
+# Archived Next.js website working/build directories
 .next/
 out/
+website/archived-export/
 
-# IMPORTANT: docs/ is intentionally NOT ignored.
-# The command-center Vite build emits into docs/command-center/ because GitHub Pages
-# publishes this repository from main:/docs. The website at docs/ remains intact.
+# IMPORTANT: docs/ is intentionally NOT ignored. GitHub Pages publishes
+# main:/docs; only Command Center output and its root redirect belong there.
 
 # Environment
 .env
 .env.local
 .env.*.local
-# .env.production is intentionally committed: it contains public Pages paths only.
+# website/.env.production is intentionally committed: it contains public website paths only.
 
 # Local/tooling output
 dist/
