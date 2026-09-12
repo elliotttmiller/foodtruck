@@ -1,10 +1,16 @@
 name: Build Command Center
 
 on:
+  pull_request:
+    paths:
+      - 'command-center/**'
+      - 'supabase/**'
+      - '.github/workflows/build-command-center.yml'
   push:
     branches: [main]
     paths:
       - 'command-center/**'
+      - 'supabase/**'
       - '.github/workflows/build-command-center.yml'
   workflow_dispatch:
 
@@ -12,11 +18,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: command-center-build
+  group: command-center-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  verify:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -29,16 +35,23 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: command-center/package-lock.json
-      - name: Install
+      - name: Install frontend
         working-directory: command-center
         run: npm ci
-      - name: Test
+      - name: Test frontend
         working-directory: command-center
         run: npm test
-      - name: Build
+      - name: Build frontend
         working-directory: command-center
         run: npm run build
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check edge functions
+        run: deno check supabase/functions/square-webhook/index.ts supabase/functions/orders-api/index.ts
       - name: Commit generated Pages build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
