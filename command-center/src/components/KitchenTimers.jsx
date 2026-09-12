@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Clock3, X } from 'lucide-react';
+import { Check, Clock3, Pause, Play, X } from 'lucide-react';
 import { finishElapsed, remainingMs, restoreTimers, TIMER_PRESETS, timerLabels } from '../lib/kitchenTimers.js';
 import '../timers.css';
 
@@ -11,6 +11,24 @@ function loadTimers() {
 function display(ms) {
   const total = Math.ceil(ms / 1000);
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+function playFinishChime(context) {
+  // Three spaced two-note chimes are easier to catch across a kitchen than one sharp beep.
+  for (const repeat of [0, .85, 1.7]) {
+    for (const [offset, frequency, peak] of [[0, 740, .12], [.17, 990, .10]]) {
+      const start = context.currentTime + repeat + offset;
+      const oscillator = context.createOscillator();
+      const volume = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      volume.gain.setValueAtTime(.0001, start);
+      volume.gain.exponentialRampToValueAtTime(peak, start + .025);
+      volume.gain.exponentialRampToValueAtTime(.0001, start + .27);
+      oscillator.connect(volume).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + .29);
+    }
+  }
 }
 
 export function KitchenTimers() {
@@ -44,17 +62,7 @@ export function KitchenTimers() {
     setOpen(true);
     if (document.visibilityState === 'visible' && sound.current?.state === 'running') {
       try {
-        [0, .25, .5].forEach(delay => {
-          const oscillator = sound.current.createOscillator();
-          const volume = sound.current.createGain();
-          oscillator.type = 'sine'; oscillator.frequency.value = 880;
-          volume.gain.setValueAtTime(.0001, sound.current.currentTime + delay);
-          volume.gain.exponentialRampToValueAtTime(.16, sound.current.currentTime + delay + .02);
-          volume.gain.exponentialRampToValueAtTime(.0001, sound.current.currentTime + delay + .18);
-          oscillator.connect(volume).connect(sound.current.destination);
-          oscillator.start(sound.current.currentTime + delay);
-          oscillator.stop(sound.current.currentTime + delay + .2);
-        });
+        playFinishChime(sound.current);
       } catch { /* The persistent visual alert remains available when audio is blocked. */ }
     }
   }, [now, timers]);
@@ -101,7 +109,7 @@ export function KitchenTimers() {
       <div className="timer-panel-content"><div className="timer-presets">{TIMER_PRESETS.map(preset => <button type="button" key={preset.label} onClick={() => add(preset.label, preset.seconds)} disabled={timers.length >= 30}>+ {preset.label} <small>{display(preset.seconds * 1000)}</small></button>)}</div>
         <form className="timer-custom" onSubmit={addCustom}><label htmlFor="timer-name">Custom timer</label><div><input id="timer-name" placeholder="Label" aria-label="Timer label" maxLength={40} required value={customLabel} onChange={event => setCustomLabel(event.target.value)}/><input aria-label="Minutes" title="Minutes" placeholder="min" type="number" min="0" max="240" value={minutes} onChange={event => setMinutes(event.target.value)}/><input aria-label="Seconds" title="Seconds" placeholder="sec" type="number" min="0" max="59" value={seconds} onChange={event => setSeconds(event.target.value)}/><button type="submit" disabled={timers.length >= 30 || !(Number(minutes || 0) * 60 + Number(seconds || 0))}>Start</button></div></form>
         {storageError ? <p className="timer-storage-warning" role="alert">Timers may not survive a page refresh because browser storage is unavailable.</p> : null}
-        <div className="timer-list" aria-live="off">{timers.length ? timers.map((timer, index) => <div className={`timer-row ${timer.state}`} key={timer.id}><div className="timer-row-info"><strong>{labels[index]}</strong><span>{timer.state === 'done' ? 'Time is up' : timer.state === 'paused' ? 'Paused' : 'Cooking'}</span></div><strong className="timer-countdown">{timer.state === 'done' ? 'DONE' : display(remainingMs(timer, now))}</strong><div className="timer-row-actions">{timer.state === 'running' ? <button type="button" onClick={() => pause(timer)}>Pause</button> : timer.state === 'paused' ? <button type="button" onClick={() => resume(timer)}>Resume</button> : null}<button type="button" onClick={() => remove(timer.id)}>{timer.state === 'done' ? 'Dismiss' : 'Remove'}</button></div></div>) : <p className="timer-empty">Start a preset to track cooking times.</p>}</div>
+        <div className="timer-list" aria-live="off">{timers.length ? timers.map((timer, index) => <div className={`timer-row ${timer.state}`} key={timer.id}><div className="timer-row-info"><strong>{labels[index]}</strong><span>{timer.state === 'done' ? 'Time is up' : timer.state === 'paused' ? 'Paused' : 'Cooking'}</span></div><strong className="timer-countdown">{timer.state === 'done' ? 'DONE' : display(remainingMs(timer, now))}</strong><div className="timer-row-actions">{timer.state === 'running' ? <button type="button" title={`Pause ${labels[index]}`} aria-label={`Pause ${labels[index]}`} onClick={() => pause(timer)}><Pause size={16} aria-hidden="true"/></button> : timer.state === 'paused' ? <button type="button" title={`Resume ${labels[index]}`} aria-label={`Resume ${labels[index]}`} onClick={() => resume(timer)}><Play size={16} aria-hidden="true"/></button> : null}<button type="button" title={timer.state === 'done' ? `Dismiss ${labels[index]}` : `Remove ${labels[index]}`} aria-label={timer.state === 'done' ? `Dismiss ${labels[index]}` : `Remove ${labels[index]}`} onClick={() => remove(timer.id)}>{timer.state === 'done' ? <Check size={17} aria-hidden="true"/> : <X size={16} aria-hidden="true"/>}</button></div></div>) : <p className="timer-empty">Start a preset to track cooking times.</p>}</div>
       </div></section> : null}
   </div>;
 }
