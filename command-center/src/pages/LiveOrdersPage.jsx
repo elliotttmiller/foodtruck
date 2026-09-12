@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, Check, RefreshCw, Wifi, WifiOff } from 'lucide-react';
-import { authorizeKiosk, clearLiveSession, ensureSession, fetchLiveOrders, kioskStatus, loadLiveSession, requestSquareSync, setOrderStatus, subscribeToOrders } from '../lib/liveOrders.js';
+import { clearLiveSession, ensureSession, fetchLiveOrders, loadLiveSession, requestSquareSync, setOrderStatus, signInStaff, signOutStaff, staffStatus, subscribeToOrders } from '../lib/liveOrders.js';
 
 function elapsed(from){if(!from)return'--:--';const sec=Math.max(0,Math.floor((Date.now()-new Date(from).getTime())/1000));const m=Math.floor(sec/60);return`${m}:${String(sec%60).padStart(2,'0')}`;}
 function urgency(order){const age=(Date.now()-new Date(order.source_created_at||order.created_at).getTime())/60000;return age>=8?'overdue':age>=5?'warning':'';}
@@ -10,7 +10,8 @@ function OrderItems({items=[]}){return <div className="live-items">{items.map((i
 export function LiveOrdersPage(){
   const [session,setSession]=useState(()=>loadLiveSession());
   const [authorized,setAuthorized]=useState(false);
-  const [pin,setPin]=useState('');
+  const [username,setUsername]=useState('staff');
+  const [password,setPassword]=useState('');
   const [orders,setOrders]=useState([]);
   const [connection,setConnection]=useState(navigator.onLine?'connecting':'offline');
   const [lastUpdated,setLastUpdated]=useState(null);
@@ -23,20 +24,20 @@ export function LiveOrdersPage(){
 
   const load=useCallback(async(token)=>{try{const data=await fetchLiveOrders(token);setOrders(data);setAuthorized(true);setLastUpdated(new Date());setError('');return true;}catch(err){if(err.code==='AUTH'){setAuthorized(false);return false;}setError(err.message);return false;}},[]);
 
-  useEffect(()=>{let cancelled=false;(async()=>{if(!session)return;try{const fresh=await ensureSession(session);if(cancelled)return;if(fresh.accessToken!==session.accessToken)setSession(fresh);if(await kioskStatus(fresh.accessToken))await load(fresh.accessToken);else setAuthorized(false);}catch(err){if(!cancelled){setAuthorized(false);setError(err.message);}}})();return()=>{cancelled=true;};},[session?.accessToken,load]);
+  useEffect(()=>{let cancelled=false;(async()=>{if(!session)return;try{const fresh=await ensureSession(session);if(cancelled)return;if(fresh.accessToken!==session.accessToken)setSession(fresh);if(await staffStatus(fresh.accessToken))await load(fresh.accessToken);else{clearLiveSession();setSession(null);setAuthorized(false);}}catch(err){if(!cancelled){setAuthorized(false);setError(err.message);}}})();return()=>{cancelled=true;};},[session?.accessToken,load]);
   useEffect(()=>{if(!authorized||!session?.accessToken)return;let cancelled=false;const token=session.accessToken;const reconcile=async(windowMinutes)=>{try{await requestSquareSync(token,windowMinutes);if(!cancelled)await load(token);}catch(err){if(!cancelled)setError(`Square reconciliation failed: ${err.message}. Use backup tickets until verified.`);}};const stop=subscribeToOrders(token,()=>load(token),state=>{setConnection(state);if(state==='connected')load(token);});reconcile();const syncTimer=setInterval(()=>reconcile(30),5*60*1000);const poll=setInterval(async()=>{const ok=await load(token);if(!ok)setConnection(navigator.onLine?'reconnecting':'offline');},15000);const timer=setInterval(()=>tick(v=>v+1),1000);return()=>{cancelled=true;stop();clearInterval(syncTimer);clearInterval(poll);clearInterval(timer);};},[authorized,session?.accessToken,load]);
   useEffect(()=>{if(!session)return;const timer=setInterval(async()=>{try{const fresh=await ensureSession(sessionRef.current);if(fresh.accessToken!==sessionRef.current?.accessToken)setSession(fresh);}catch(err){setAuthorized(false);setError(err.message);}},30000);return()=>clearInterval(timer);},[Boolean(session)]);
   useEffect(()=>{const online=()=>{setConnection('connecting');if(sessionRef.current?.accessToken)load(sessionRef.current.accessToken);};const offline=()=>setConnection('offline');addEventListener('online',online);addEventListener('offline',offline);return()=>{removeEventListener('online',online);removeEventListener('offline',offline);};},[load]);
 
-  const login=async event=>{event.preventDefault();setError('');try{const fresh=await ensureSession(session);setSession(fresh);await authorizeKiosk(fresh.accessToken,pin);setPin('');await load(fresh.accessToken);}catch(err){setError(err.message);}};
+  const login=async event=>{event.preventDefault();setError('');try{const fresh=await signInStaff(username,password);setPassword('');setSession(fresh);await load(fresh.accessToken);}catch(err){setError(err.message);}};
   const move=async(order,status)=>{setBusyId(order.id);setError('');try{await setOrderStatus(session.accessToken,order.id,status,order.status);await load(session.accessToken);}catch(err){await load(session.accessToken);setError(err.message);}finally{setBusyId('');}};
   const sync=async()=>{setSyncing(true);setError('');try{await requestSquareSync(session.accessToken);await load(session.accessToken);}catch(err){setError(err.message);}finally{setSyncing(false);}};
-  const logout=()=>{clearLiveSession();setSession(null);setAuthorized(false);setOrders([]);};
+  const logout=()=>{const current=session;setSession(null);setAuthorized(false);setOrders([]);clearLiveSession();if(current)signOutStaff(current).catch(()=>{});};
 
   const active=useMemo(()=>orders.filter(o=>o.status==='active'),[orders]);
   const ready=useMemo(()=>orders.filter(o=>o.status==='ready'),[orders]);
 
-  if(!authorized)return <section className="live-auth"><div className="live-auth-card"><img src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><h1>Live Orders</h1><p>Enter the truck PIN to open the Square-synchronized service board.</p><form onSubmit={login}><label htmlFor="live-pin">Truck PIN</label><input id="live-pin" type="password" inputMode="numeric" autoComplete="current-password" value={pin} onChange={e=>setPin(e.target.value)} autoFocus required/><button type="submit" className="live-primary">Open Live Orders</button></form>{error?<div className="live-error"><AlertTriangle size={16}/>{error}</div>:null}</div></section>;
+  if(!authorized)return <section className="live-auth"><div className="live-auth-card"><img src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><h1>Staff Sign In</h1><p>Sign in to open the Square-synchronized service board.</p><form onSubmit={login}><label htmlFor="live-username">Username</label><input id="live-username" type="text" autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} autoFocus required/><label htmlFor="live-password">Password</label><input id="live-password" type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required/><button type="submit" className="live-primary">Open Live Orders</button></form>{error?<div className="live-error"><AlertTriangle size={16}/>{error}</div>:null}</div></section>;
 
   return <section className="live-board" aria-live="polite">
     <header className="live-header"><img className="live-logo" src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><div className={`live-connection ${connection}`}><span className="status-dot"/>{connection==='connected'?<Wifi size={16}/>:<WifiOff size={16}/>}<div><strong>{connection==='connected'?'Live board':connection==='offline'?'Offline — use backup tickets':'Reconnecting — check tickets'}</strong><span>{lastUpdated?`Last database update ${elapsed(lastUpdated)} ago`:'Waiting for first update'}</span></div></div><div className="live-tools"><button type="button" className="live-quiet" onClick={sync} disabled={syncing}><RefreshCw size={16} className={syncing?'spin':''}/>{syncing?'Syncing':'Refresh from Square'}</button><button type="button" className="live-quiet" onClick={logout}>Lock</button></div></header>
