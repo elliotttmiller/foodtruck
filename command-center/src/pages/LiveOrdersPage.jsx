@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, BookOpen, X } from 'lucide-react';
 import { MenuQuickReference } from '../components/MenuQuickReference.jsx';
+import { KitchenTimers } from '../components/KitchenTimers.jsx';
 import { clearLiveSession, ensureSession, fetchLiveOrders, loadLiveSession, requestSquareSync, setOrderStatus, signInStaff, signOutStaff, staffStatus, subscribeToOrders } from '../lib/liveOrders.js';
 
 function elapsed(from){if(!from)return'--:--';const sec=Math.max(0,Math.floor((Date.now()-new Date(from).getTime())/1000));const m=Math.floor(sec/60);return`${m}:${String(sec%60).padStart(2,'0')}`;}
@@ -67,7 +68,7 @@ export function LiveOrdersPage(){
     <header className="live-header">
       <div className="live-brand"><img className="live-logo" src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><div className="live-brand-copy"><h1>LIVE ORDERS</h1><span>{serviceDate.format(new Date())}</span></div></div>
       <div className={`live-connection ${connection}`} role="status" aria-live="polite"><span className="status-dot"/><div><strong>{connection==='connected'?'Realtime connected':connection==='offline'?'Offline — use backup tickets':'Reconnecting'}</strong><span>{lastUpdated?`Database updated ${elapsed(lastUpdated)} ago`:'Waiting for database update'}</span></div></div>
-      <div className="live-tools"><button type="button" className="live-quiet live-menu-trigger" aria-label="Open menu quick view" title="Menu quick view" onClick={()=>setMenuOpen(true)}><BookOpen size={18} aria-hidden="true"/></button><button type="button" className="live-quiet" onClick={sync} disabled={syncing}><span>{syncing?'Syncing…':'Refresh from Square'}</span></button><button type="button" className="live-quiet live-exit" onClick={logout}><span>Lock</span></button></div>
+      <div className="live-tools"><KitchenTimers/><button type="button" className="live-quiet live-menu-trigger" aria-label="Open menu quick view" title="Menu quick view" onClick={()=>setMenuOpen(true)}><BookOpen size={18} aria-hidden="true"/></button><button type="button" className="live-quiet" onClick={sync} disabled={syncing}><span>{syncing?'Syncing…':'Refresh from Square'}</span></button><button type="button" className="live-quiet live-exit" onClick={logout}><span>Lock</span></button></div>
     </header>
     {error?<div className="live-banner error" role="alert"><AlertTriangle size={17}/><span>{error}</span></div>:null}
     <div className="live-lanes">

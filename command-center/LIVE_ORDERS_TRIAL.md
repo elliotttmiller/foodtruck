@@ -2,6 +2,8 @@
 
 The Live Orders board shows Square-backed orders only. Use a real paid transaction from the truck's Square production location to verify end-to-end delivery. The **Menu** button in the board header opens a quick staff reference; choose the current menu image once on the laptop, and the image is saved only in this browser on this device. Replace it when the menu changes.
 
+The **Timers** control in the Live Orders header can run multiple Fries (4:00), Wings (8:00), or custom timers independently. Running timers survive a page refresh in the same browser; expired timers remain visible until dismissed. If sound is permitted by the browser, an open browser tab plays an alert. Keep the laptop awake and the board open during service; browsers and operating systems may delay or silence audio when sleeping or in the background. These kitchen timers do not change order status or sync to Square.
+
 Command Center is published under `/foodtruck/command-center/#/live-orders` when GitHub Pages serves `docs/` at `/foodtruck/`. The existing website at the Pages root remains intact. The browser's publishable Supabase key is public; **never put a Square access token, Square signature key, service-role key, or truck secret into GitHub or browser configuration.**
 
 ## Supabase connection settings
