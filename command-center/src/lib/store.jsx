@@ -11,14 +11,14 @@ function emptyState() {
   return {
     meta:{ schemaVersion:SCHEMA_VERSION, revision:0, updatedAt:null },
     settings:{ businessName:'Uff-Da Eats', currency:'USD', defaultProcessingPct:'0', defaultProcessingFixed:'0', defaultOverhead:'0' },
-    ingredients:[], dailyReports:[], sales:[], customers:[], events:[], inventory:[], menu:[], purchases:[], vendors:[], labor:[], expenses:[],
+    ingredients:[], jobSessions:[], dailyReports:[], sales:[], customers:[], events:[], inventory:[], menu:[], purchases:[], vendors:[], labor:[], expenses:[],
   };
 }
 
 export function normalizeState(input) {
   const base = emptyState();
   const next = { ...base, ...(input || {}), meta:{...base.meta,...(input?.meta || {})}, settings:{...base.settings,...(input?.settings || {})} };
-  [...Object.keys(GENERIC_MODULES), 'ingredients', 'dailyReports'].forEach(key => { if (!Array.isArray(next[key])) next[key] = []; });
+  [...Object.keys(GENERIC_MODULES), 'ingredients', 'jobSessions', 'dailyReports'].forEach(key => { if (!Array.isArray(next[key])) next[key] = []; });
   next.meta.schemaVersion = SCHEMA_VERSION;
   return next;
 }
