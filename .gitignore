@@ -15,8 +15,8 @@ lerna-debug.log*
 out/
 
 # IMPORTANT: docs/ is intentionally NOT ignored.
-# `npm run build` copies the static export into docs/ because GitHub Pages
-# publishes this repository from main:/docs.
+# The command-center Vite build emits into docs/ because GitHub Pages publishes
+# this repository from main:/docs.
 
 # Environment
 .env
