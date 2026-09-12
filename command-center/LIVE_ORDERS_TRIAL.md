@@ -1,0 +1,19 @@
+# Live Orders: production trial runbook
+
+Command Center is published under `/foodtruck/command-center/#/live-orders` when GitHub Pages serves `docs/` at `/foodtruck/`. The existing website at the Pages root remains intact. The browser's publishable Supabase key is public; **never put a Square access token, Square signature key, service-role key, or truck secret into GitHub or browser configuration.**
+
+## Before service
+
+1. In Supabase project **Order Manager**, enable anonymous sign-ins in Authentication. In Edge Function secrets, set `SQUARE_ACCESS_TOKEN` (production Square token with `PAYMENTS_READ`, `ORDERS_READ`, and `MERCHANT_PROFILE_READ` if location discovery is used), `SQUARE_LOCATION_ID` (the truck's actual production location), `SQUARE_WEBHOOK_SIGNATURE_KEY`, `SQUARE_WEBHOOK_NOTIFICATION_URL`, and `KIOSK_PIN_SHA256` (lowercase SHA-256 hex digest of a unique, long truck passphrase). Set `ALLOWED_ORIGIN` to the exact Pages origin, such as `https://elliotttmiller.github.io`. Square webhook signature validation needs the **exact** URL in the Square subscription, including case and trailing slash.
+2. In Square Developer Console **production**, subscribe to `payment.created`, `payment.updated`, `order.created`, and `order.updated` at `https://xgyqjnfdqekwlofhtpcj.supabase.co/functions/v1/square-webhook`. Copy that subscription's production signature key into the Edge Function secret. The receiver rejects unsigned requests; never disable verification.
+3. Inspect one actual Square phone/POS transaction. Confirm its payment has an `order_id`, the order has the right `location_id` and line items, and the customer/ticket name and modifiers survive into the Orders API. Enter the name in Square if it is currently written only on paper. Check Square's precise field in the returned order before relying on names in the kitchen.
+4. Open the board, enter the truck passphrase, and use **Refresh from Square**. Confirm one known paid transaction appears once with the correct name, quantity, modifiers and notes. A completed Square payment with an order ID is eligible even when its order remains `OPEN`; orders without a completed payment can also arrive after Square moves their order to `COMPLETED`.
+5. Simulate a browser disconnect and reconnection. Check that the board recovers and a manual refresh picks up the same order without duplicating it. Keep backup paper tickets beside the window.
+
+The board polls the database every 15 seconds and reconciles the preceding 30 minutes of Square payments every five minutes, as well as reconciling the preceding 18 hours on opening. Reconciliation is bounded to 1,000 payments; failures display a banner. **Live board** means the browser's database connection is active. It does not prove that Square itself is sending events. If a payment is missing, use **Refresh from Square**, and use backup tickets until its presence and contents are verified.
+
+Statuses are `active → ready → complete`. The server enforces transitions, time stamps them, and protects every order row with kiosk authorization. Square credentials and event processing remain in Edge Functions. The raw Square order is intentionally excluded from the browser-readable orders table to avoid exposing contact/payment details. Look at Square's order by its stored `square_order_id` for diagnostics.
+
+## Configuration still required
+
+The backend functions and schema can be deployed without Square credentials but cannot ingest or reconcile real orders until the production secrets and webhook subscription above exist. Anonymous Auth must be enabled and the passphrase secret configured before kiosk login. Do not retire paper until a live paid order has been observed end to end in this actual Square account.

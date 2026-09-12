@@ -5,10 +5,10 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   build: {
-    outDir: '../docs',
+    outDir: '../docs/command-center',
     emptyOutDir: true,
     target: 'es2022',
-    sourcemap: true,
+    sourcemap: false,
     cssCodeSplit: false,
     rollupOptions: {
       output: {

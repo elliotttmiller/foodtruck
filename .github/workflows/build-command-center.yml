@@ -1,0 +1,64 @@
+name: Build Command Center
+
+on:
+  pull_request:
+    paths:
+      - 'command-center/**'
+      - 'supabase/**'
+      - '.github/workflows/build-command-center.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'command-center/**'
+      - 'supabase/**'
+      - '.github/workflows/build-command-center.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: command-center-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: command-center/package-lock.json
+      - name: Install frontend
+        working-directory: command-center
+        run: npm ci
+      - name: Test frontend
+        working-directory: command-center
+        run: npm test
+      - name: Build frontend
+        working-directory: command-center
+        run: npm run build
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check edge functions
+        run: deno check supabase/functions/square-webhook/index.ts supabase/functions/orders-api/index.ts
+      - name: Commit generated Pages build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "Build command center"
+          git push
