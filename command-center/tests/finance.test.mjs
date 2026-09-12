@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { dollarsToCents, ingredientCostCents, buildUsageSnapshot, calculateDailyReport, unitCompatible } from '../src/lib/finance.js';
+import { dollarsToCents, ingredientCostCents, buildUsageSnapshot, buildReconciledUsageSnapshot, calculateDailyReport, reconcileCount, unitCompatible } from '../src/lib/finance.js';
 
 test('currency parses and rounds deterministically', () => {
   assert.equal(dollarsToCents('42.90'), 4290);
@@ -16,6 +16,20 @@ test('unit dimensions must match', () => {
   assert.equal(unitCompatible('lb', 'oz'), true);
   assert.equal(unitCompatible('gallon', 'floz'), true);
   assert.equal(unitCompatible('lb', 'gallon'), false);
+});
+
+test('inventory reconciliation uses exact decimal arithmetic', () => {
+  assert.deepEqual(reconcileCount({ startQty:'20.5', additionsQty:'4.25', endQty:'8.75', wasteQty:'1.5', compQty:'0.5' }), { depletedQty:'16', serviceQty:'14', wasteQty:'1.5', compQty:'0.5' });
+  assert.throws(() => reconcileCount({ startQty:'10', additionsQty:'0', endQty:'12' }), /End count/);
+  assert.throws(() => reconcileCount({ startQty:'10', endQty:'5', wasteQty:'4', compQty:'2' }), /Waste and comp/);
+});
+
+test('reconciled usage snapshot costs all depletion while separating waste and comp', () => {
+  const ingredient={id:'soda',name:'Soda',category:'Beverage',trackingType:'direct-sale',purchaseQuantity:'24',purchaseUnit:'each',purchaseCostCents:2400,effectiveDate:'2026-09-01'};
+  const usage=buildReconciledUsageSnapshot(ingredient,{startQty:'24',additionsQty:'12',endQty:'6',wasteQty:'1',compQty:'2',unit:'each'});
+  assert.equal(usage.depletedQty,'30');
+  assert.equal(usage.soldQty,'27');
+  assert.equal(usage.totalCostCents,3000);
 });
 
 test('daily report excludes sales tax from net revenue and composes costs', () => {
