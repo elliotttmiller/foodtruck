@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, BookOpen, X } from 'lucide-react';
+import { MenuQuickReference } from '../components/MenuQuickReference.jsx';
 import { clearLiveSession, ensureSession, fetchLiveOrders, loadLiveSession, requestSquareSync, setOrderStatus, signInStaff, signOutStaff, staffStatus, subscribeToOrders } from '../lib/liveOrders.js';
 
 function elapsed(from){if(!from)return'--:--';const sec=Math.max(0,Math.floor((Date.now()-new Date(from).getTime())/1000));const m=Math.floor(sec/60);return`${m}:${String(sec%60).padStart(2,'0')}`;}
@@ -24,63 +25,50 @@ function OrderDetail({order,busy,onClose,onMove}){
   </div>;
 }
 
-// Preview tickets never touch Supabase or Square. They exist in browser memory only.
-const previewTickets={
-  42:{name:'MIKE',items:[{name:'DOUBLE SMASH',quantity:2,modifiers:['NO ONION']},{name:'LOADED FRIES',quantity:1,note:'Extra sauce on side'}]},
-  44:{name:'JEN',items:[{name:'CLASSIC SMASH',quantity:1,modifiers:['ADD PICKLES']},{name:'FRIES',quantity:1}]},
-  45:{name:'ALEX',items:[{name:'WINGS',quantity:6,variation:'GARLIC PARMESAN'}]},
-  46:{name:'TAYLOR',items:[{name:'DOUBLE SMASH',quantity:1,modifiers:['NO CHEESE']}]},
-  43:{name:'SARAH',items:[{name:'CLASSIC SMASH',quantity:1},{name:'FRIES',quantity:1}]},
-  39:{name:'ELLIOTT',items:[{name:'DOUBLE SMASH',quantity:2,modifiers:['ADD BACON']},{name:'LOADED FRIES',quantity:1}]},
-  40:{name:'MORGAN',items:[{name:'WINGS',quantity:1,variation:'BUFFALO'}]},
-};
-function previewOrder(number,status='active') {const now=new Date().toISOString();const ticket=previewTickets[number]||{name:'GUEST',items:[{name:'SMASH BURGER',quantity:1,modifiers:['ADD CHEESE']},{name:'WINGS',quantity:1,variation:'GARLIC PARMESAN'}]};return{id:`preview-${number}`,ticket_number:number,customer_name:ticket.name,status,created_at:now,source_created_at:now,ready_at:status==='ready'?now:null,items:ticket.items};}
-
-export function LiveOrdersPage({demo=false}){
-  const [session,setSession]=useState(()=>demo?null:loadLiveSession());
-  const [authorized,setAuthorized]=useState(demo);
+export function LiveOrdersPage(){
+  const [session,setSession]=useState(loadLiveSession);
+  const [authorized,setAuthorized]=useState(false);
   const [username,setUsername]=useState('staff');
   const [password,setPassword]=useState('');
-  const [orders,setOrders]=useState(()=>demo?[42,44,45,46].map(number=>previewOrder(number)).concat([43,39,40].map(number=>previewOrder(number,'ready'))):[]);
-  const [connection,setConnection]=useState(demo?'connected':navigator.onLine?'connecting':'offline');
+  const [orders,setOrders]=useState([]);
+  const [connection,setConnection]=useState(navigator.onLine?'connecting':'offline');
   const [lastUpdated,setLastUpdated]=useState(null);
   const [error,setError]=useState('');
   const [busyId,setBusyId]=useState('');
   const [selectedId,setSelectedId]=useState(null);
+  const [menuOpen,setMenuOpen]=useState(false);
   const [syncing,setSyncing]=useState(false);
   const [,tick]=useState(0);
   const sessionRef=useRef(session);
-  const nextPreview=useRef(47);
   sessionRef.current=session;
 
   const load=useCallback(async(token)=>{try{const data=await fetchLiveOrders(token);setOrders(data);setAuthorized(true);setLastUpdated(new Date());setError('');return true;}catch(err){if(err.code==='AUTH'){setAuthorized(false);return false;}setError(err.message);return false;}},[]);
 
-  useEffect(()=>{if(demo)return;let cancelled=false;(async()=>{if(!session)return;try{const fresh=await ensureSession(session);if(cancelled)return;if(fresh.accessToken!==session.accessToken)setSession(fresh);if(await staffStatus(fresh.accessToken))await load(fresh.accessToken);else{clearLiveSession();setSession(null);setAuthorized(false);}}catch(err){if(!cancelled){setAuthorized(false);setError(err.message);}}})();return()=>{cancelled=true;};},[demo,session?.accessToken,load]);
-  useEffect(()=>{if(demo||!authorized||!session?.accessToken)return;let cancelled=false;const token=session.accessToken;const reconcile=async(windowMinutes)=>{try{await requestSquareSync(token,windowMinutes);if(!cancelled)await load(token);}catch(err){if(!cancelled)setError(`Square reconciliation failed: ${err.message}. Use backup tickets until verified.`);}};const stop=subscribeToOrders(token,()=>load(token),state=>{setConnection(state);if(state==='connected')load(token);});reconcile();const syncTimer=setInterval(()=>reconcile(30),5*60*1000);const poll=setInterval(async()=>{const ok=await load(token);if(!ok)setConnection(navigator.onLine?'reconnecting':'offline');},15000);const timer=setInterval(()=>tick(v=>v+1),1000);return()=>{cancelled=true;stop();clearInterval(syncTimer);clearInterval(poll);clearInterval(timer);};},[demo,authorized,session?.accessToken,load]);
-  useEffect(()=>{if(demo||!session)return;const timer=setInterval(async()=>{try{const fresh=await ensureSession(sessionRef.current);if(fresh.accessToken!==sessionRef.current?.accessToken)setSession(fresh);}catch(err){setAuthorized(false);setError(err.message);}},30000);return()=>clearInterval(timer);},[demo,Boolean(session)]);
-  useEffect(()=>{if(demo)return;const online=()=>{setConnection('connecting');if(sessionRef.current?.accessToken)load(sessionRef.current.accessToken);};const offline=()=>setConnection('offline');addEventListener('online',online);addEventListener('offline',offline);return()=>{removeEventListener('online',online);removeEventListener('offline',offline);};},[demo,load]);
-  useEffect(()=>{if(!demo)return;const timer=setInterval(()=>tick(v=>v+1),1000);return()=>clearInterval(timer);},[demo]);
+  useEffect(()=>{let cancelled=false;(async()=>{if(!session)return;try{const fresh=await ensureSession(session);if(cancelled)return;if(fresh.accessToken!==session.accessToken)setSession(fresh);if(await staffStatus(fresh.accessToken))await load(fresh.accessToken);else{clearLiveSession();setSession(null);setAuthorized(false);}}catch(err){if(!cancelled){setAuthorized(false);setError(err.message);}}})();return()=>{cancelled=true;};},[session?.accessToken,load]);
+  useEffect(()=>{if(!authorized||!session?.accessToken)return;let cancelled=false;const token=session.accessToken;const reconcile=async(windowMinutes)=>{try{await requestSquareSync(token,windowMinutes);if(!cancelled)await load(token);}catch(err){if(!cancelled)setError(`Square reconciliation failed: ${err.message}. Use backup tickets until verified.`);}};const stop=subscribeToOrders(token,()=>load(token),state=>{setConnection(state);if(state==='connected')load(token);});reconcile();const syncTimer=setInterval(()=>reconcile(30),5*60*1000);const poll=setInterval(async()=>{const ok=await load(token);if(!ok)setConnection(navigator.onLine?'reconnecting':'offline');},15000);const timer=setInterval(()=>tick(v=>v+1),1000);return()=>{cancelled=true;stop();clearInterval(syncTimer);clearInterval(poll);clearInterval(timer);};},[authorized,session?.accessToken,load]);
+  useEffect(()=>{if(!session)return;const timer=setInterval(async()=>{try{const fresh=await ensureSession(sessionRef.current);if(fresh.accessToken!==sessionRef.current?.accessToken)setSession(fresh);}catch(err){setAuthorized(false);setError(err.message);}},30000);return()=>clearInterval(timer);},[Boolean(session)]);
+  useEffect(()=>{const online=()=>{setConnection('connecting');if(sessionRef.current?.accessToken)load(sessionRef.current.accessToken);};const offline=()=>setConnection('offline');addEventListener('online',online);addEventListener('offline',offline);return()=>{removeEventListener('online',online);removeEventListener('offline',offline);};},[load]);
 
   const login=async event=>{event.preventDefault();setError('');try{const fresh=await signInStaff(username,password);setPassword('');setSession(fresh);await load(fresh.accessToken);}catch(err){setError(err.message);}};
-  const move=async(order,status)=>{if(demo){setOrders(current=>current.map(item=>item.id===order.id?{...item,status,ready_at:status==='ready'?new Date().toISOString():item.ready_at}:item));setSelectedId(null);return;}setBusyId(order.id);setError('');try{await setOrderStatus(session.accessToken,order.id,status,order.status);setSelectedId(null);await load(session.accessToken);}catch(err){await load(session.accessToken);setError(err.message);}finally{setBusyId('');}};
-  const sync=async()=>{if(demo){setOrders(current=>[...current,previewOrder(nextPreview.current++)]);return;}setSyncing(true);setError('');try{await requestSquareSync(session.accessToken);await load(session.accessToken);}catch(err){setError(err.message);}finally{setSyncing(false);}};
-  const logout=()=>{if(demo){location.hash='#/live-orders';return;}const current=session;setSession(null);setAuthorized(false);setOrders([]);clearLiveSession();if(current)signOutStaff(current).catch(()=>{});};
+  const move=async(order,status)=>{setBusyId(order.id);setError('');try{await setOrderStatus(session.accessToken,order.id,status,order.status);setSelectedId(null);await load(session.accessToken);}catch(err){await load(session.accessToken);setError(err.message);}finally{setBusyId('');}};
+  const sync=async()=>{setSyncing(true);setError('');try{await requestSquareSync(session.accessToken);await load(session.accessToken);}catch(err){setError(err.message);}finally{setSyncing(false);}};
+  const logout=()=>{const current=session;setSession(null);setAuthorized(false);setOrders([]);clearLiveSession();if(current)signOutStaff(current).catch(()=>{});};
 
   const active=useMemo(()=>orders.filter(o=>o.status==='active'),[orders]);
   const ready=useMemo(()=>orders.filter(o=>o.status==='ready'),[orders]);
   const selectedOrder=orders.find(order=>order.id===selectedId);
   const closeDetail=useCallback(()=>setSelectedId(null),[]);
+  const closeMenu=useCallback(()=>setMenuOpen(false),[]);
   useEffect(()=>{if(selectedId&&!selectedOrder)setSelectedId(null);},[selectedId,selectedOrder]);
 
-  if(!authorized)return <section className="live-auth"><div className="live-auth-card"><img src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><h1>Staff Sign In</h1><p>Sign in to open the Square-synchronized service board.</p><form onSubmit={login}><label htmlFor="live-username">Username</label><input id="live-username" type="text" autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} autoFocus required/><label htmlFor="live-password">Password</label><input id="live-password" type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required/><button type="submit" className="live-primary">Open Live Orders</button></form><a href="#/live-orders-demo">Preview sample orders</a>{error?<div className="live-error"><AlertTriangle size={16}/>{error}</div>:null}</div></section>;
+  if(!authorized)return <section className="live-auth"><div className="live-auth-card"><img src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><h1>Staff Sign In</h1><p>Sign in to open the Square-synchronized service board.</p><form onSubmit={login}><label htmlFor="live-username">Username</label><input id="live-username" type="text" autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} autoFocus required/><label htmlFor="live-password">Password</label><input id="live-password" type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required/><button type="submit" className="live-primary">Open Live Orders</button></form>{error?<div className="live-error"><AlertTriangle size={16}/>{error}</div>:null}</div></section>;
 
   return <main className="live-board">
     <header className="live-header">
       <div className="live-brand"><img className="live-logo" src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><div className="live-brand-copy"><h1>LIVE ORDERS</h1><span>{serviceDate.format(new Date())}</span></div></div>
-      <div className={`live-connection ${demo?'demo':connection}`} role="status" aria-live="polite"><span className="status-dot"/><div><strong>{demo?'Preview only':connection==='connected'?'Realtime connected':connection==='offline'?'Offline — use backup tickets':'Reconnecting'}</strong><span>{demo?'Sample tickets · no Square connection':lastUpdated?`Database updated ${elapsed(lastUpdated)} ago`:'Waiting for database update'}</span></div></div>
-      <div className="live-tools">{!demo?<a className="live-quiet" href="#/live-orders-demo">Preview orders</a>:null}<button type="button" className="live-quiet" onClick={sync} disabled={syncing}><span>{demo?'Add test order':syncing?'Syncing…':'Refresh from Square'}</span></button><button type="button" className="live-quiet live-exit" onClick={logout}><span>{demo?'Exit preview':'Lock'}</span></button></div>
+      <div className={`live-connection ${connection}`} role="status" aria-live="polite"><span className="status-dot"/><div><strong>{connection==='connected'?'Realtime connected':connection==='offline'?'Offline — use backup tickets':'Reconnecting'}</strong><span>{lastUpdated?`Database updated ${elapsed(lastUpdated)} ago`:'Waiting for database update'}</span></div></div>
+      <div className="live-tools"><button type="button" className="live-quiet live-menu-trigger" aria-label="Open menu quick view" title="Menu quick view" onClick={()=>setMenuOpen(true)}><BookOpen size={18} aria-hidden="true"/></button><button type="button" className="live-quiet" onClick={sync} disabled={syncing}><span>{syncing?'Syncing…':'Refresh from Square'}</span></button><button type="button" className="live-quiet live-exit" onClick={logout}><span>Lock</span></button></div>
     </header>
-    {demo?<div className="live-banner preview" role="status"><span><strong>PREVIEW ONLY</strong> — Sample tickets stay in this browser tab. They are not Square sales and are never saved.</span></div>:null}
     {error?<div className="live-banner error" role="alert"><AlertTriangle size={17}/><span>{error}</span></div>:null}
     <div className="live-lanes">
       <section className="live-lane active-lane" aria-labelledby="active-title"><div className="live-section-heading"><div><h2 id="active-title">Active Orders <span>{active.length}</span></h2><p>Oldest first. Select a ticket for details; mark Ready when finished.</p></div></div>
@@ -91,5 +79,6 @@ export function LiveOrdersPage({demo=false}){
       </section>
     </div>
     {selectedOrder?<OrderDetail order={selectedOrder} busy={busyId===selectedOrder.id} onClose={closeDetail} onMove={move}/>:null}
+    {menuOpen?<MenuQuickReference onClose={closeMenu}/>:null}
   </main>;
 }

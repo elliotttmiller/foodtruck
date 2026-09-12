@@ -1,6 +1,6 @@
 # Live Orders: production trial runbook
 
-For a safe UI rehearsal, open `/foodtruck/command-center/#/live-orders-demo`. Its sample tickets and Ready/Complete changes exist only in the current browser tab. **Add test order** adds another sample without contacting Square or Supabase; it cannot verify webhook delivery or production checkout.
+The Live Orders board shows Square-backed orders only. Use a real paid transaction from the truck's Square production location to verify end-to-end delivery. The **Menu** button in the board header opens a quick staff reference; choose the current menu image once on the laptop, and the image is saved only in this browser on this device. Replace it when the menu changes.
 
 Command Center is published under `/foodtruck/command-center/#/live-orders` when GitHub Pages serves `docs/` at `/foodtruck/`. The existing website at the Pages root remains intact. The browser's publishable Supabase key is public; **never put a Square access token, Square signature key, service-role key, or truck secret into GitHub or browser configuration.**
 
