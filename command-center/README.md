@@ -42,7 +42,7 @@ npm run check
 npm run build
 ```
 
-The production bundle is emitted to the repository-level `docs/` directory for GitHub Pages.
+The production bundle is emitted to `docs/command-center/` for GitHub Pages, preserving the food-truck website at `docs/`.
 
 ## Source structure
 

@@ -2,6 +2,10 @@
 
 Command Center is published under `/foodtruck/command-center/#/live-orders` when GitHub Pages serves `docs/` at `/foodtruck/`. The existing website at the Pages root remains intact. The browser's publishable Supabase key is public; **never put a Square access token, Square signature key, service-role key, or truck secret into GitHub or browser configuration.**
 
+## Supabase connection settings
+
+The correct selection in Supabase's **Connect** panel is **Framework → React** for reference. This Vite app already has its equivalent browser configuration in `public/live-orders-config.js`: project URL `https://xgyqjnfdqekwlofhtpcj.supabase.co` and the project's `default` publishable key. It uses HTTPS Auth/Data API and a Realtime WebSocket. No database URI, password, transaction pooler, session pooler, IPv4 add-on, or `@supabase/server` package is needed for this static browser app. Edge Functions use Supabase's injected `SUPABASE_URL` and legacy service-role/anon variables; Square secrets must be set separately. For local development, `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are optional overrides when runtime config is absent. The service worker caches only same-origin Command Center assets; it never intercepts Supabase requests.
+
 ## Before service
 
 1. In Supabase project **Order Manager**, enable anonymous sign-ins in Authentication. In Edge Function secrets, set `SQUARE_ACCESS_TOKEN` (production Square token with `PAYMENTS_READ`, `ORDERS_READ`, and `MERCHANT_PROFILE_READ` if location discovery is used), `SQUARE_LOCATION_ID` (the truck's actual production location), `SQUARE_WEBHOOK_SIGNATURE_KEY`, `SQUARE_WEBHOOK_NOTIFICATION_URL`, and `KIOSK_PIN_SHA256` (lowercase SHA-256 hex digest of a unique, long truck passphrase). Set `ALLOWED_ORIGIN` to the exact Pages origin, such as `https://elliotttmiller.github.io`. Square webhook signature validation needs the **exact** URL in the Square subscription, including case and trailing slash.

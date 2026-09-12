@@ -15,8 +15,8 @@ lerna-debug.log*
 out/
 
 # IMPORTANT: docs/ is intentionally NOT ignored.
-# The command-center Vite build emits into docs/ because GitHub Pages publishes
-# this repository from main:/docs.
+# The command-center Vite build emits into docs/command-center/ because GitHub Pages
+# publishes this repository from main:/docs. The website at docs/ remains intact.
 
 # Environment
 .env

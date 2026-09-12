@@ -2,7 +2,7 @@ const STORAGE_KEY='uffda.live-orders.session.v1';
 const runtime=()=>window.__UFFDA_LIVE_ORDERS__||{};
 const required=(name,value)=>{if(!value)throw new Error(`${name} is not configured`);return value;};
 const supabaseUrl=()=>required('SUPABASE_URL',(runtime().SUPABASE_URL||import.meta.env.VITE_SUPABASE_URL||'').replace(/\/$/,''));
-const anonKey=()=>required('SUPABASE_ANON_KEY',runtime().SUPABASE_ANON_KEY||import.meta.env.VITE_SUPABASE_ANON_KEY);
+const anonKey=()=>required('SUPABASE_PUBLISHABLE_KEY',runtime().SUPABASE_PUBLISHABLE_KEY||runtime().SUPABASE_ANON_KEY||import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||import.meta.env.VITE_SUPABASE_ANON_KEY);
 
 function authHeaders(token,extra={}){return{apikey:anonKey(),Authorization:`Bearer ${token}`,'Content-Type':'application/json',...extra};}
 export function loadLiveSession(){try{return JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');}catch{return null;}}
