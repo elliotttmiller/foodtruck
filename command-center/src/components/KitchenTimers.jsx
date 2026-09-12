@@ -13,22 +13,20 @@ function display(ms) {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 }
 function playFinishChime(context) {
-  // Three batches of three familiar two-note chimes; audio ends after about five seconds.
+  // Original, low-volume radar-style rise: three notes per batch, three batches.
   for (const batch of [0, 1, 2]) {
-    for (const ding of [0, .38, .76]) {
-      for (const [offset, frequency, peak] of [[0, 740, .09], [.14, 990, .075]]) {
-        const start = context.currentTime + batch * 1.85 + ding + offset;
-        const oscillator = context.createOscillator();
-        const volume = context.createGain();
-        oscillator.type = 'sine';
-        oscillator.frequency.value = frequency;
-        volume.gain.setValueAtTime(.0001, start);
-        volume.gain.exponentialRampToValueAtTime(peak, start + .025);
-        volume.gain.exponentialRampToValueAtTime(.0001, start + .22);
-        oscillator.connect(volume).connect(context.destination);
-        oscillator.start(start);
-        oscillator.stop(start + .24);
-      }
+    for (const [offset, frequency, peak, duration] of [[0, 660, .057, .28], [.27, 785, .063, .28], [.54, 990, .068, .38]]) {
+      const start = context.currentTime + batch * 1.75 + offset;
+      const oscillator = context.createOscillator();
+      const volume = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      volume.gain.setValueAtTime(.0001, start);
+      volume.gain.exponentialRampToValueAtTime(peak, start + .035);
+      volume.gain.exponentialRampToValueAtTime(.0001, start + duration);
+      oscillator.connect(volume).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + .02);
     }
   }
 }
