@@ -13,7 +13,6 @@ create table if not exists public.live_orders (
   total_cents bigint not null default 0,
   currency text not null default 'USD',
   items jsonb not null default '[]'::jsonb,
-  raw_order jsonb not null default '{}'::jsonb,
   source_created_at timestamptz,
   last_square_event_at timestamptz,
   ready_at timestamptz,
@@ -45,12 +44,13 @@ alter table public.live_orders enable row level security;
 alter table public.processed_square_events enable row level security;
 alter table public.kiosk_sessions enable row level security;
 
+
 create or replace function public.kiosk_is_authorized()
 returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = ''
 as $$
   select exists (
     select 1
@@ -84,6 +84,16 @@ returns trigger
 language plpgsql
 as $$
 begin
+  if current_user <> 'service_role' then
+    if (old.status = 'active' and new.status <> 'ready')
+      or (old.status = 'ready' and new.status <> 'complete')
+      or old.status in ('complete','canceled')
+      or new.square_order_id is distinct from old.square_order_id then
+      raise exception 'Invalid order status transition';
+    end if;
+    new.ready_at = case when new.status = 'ready' then now() else old.ready_at end;
+    new.completed_at = case when new.status = 'complete' then now() else old.completed_at end;
+  end if;
   new.updated_at = now();
   return new;
 end;
@@ -106,4 +116,4 @@ begin
 end $$;
 
 -- Clients should receive enough UPDATE data to re-fetch deterministically.
-alter table public.live_orders replica identity full;
+-- Default replica identity avoids broadcasting an entire previous order image.
