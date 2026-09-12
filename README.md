@@ -26,7 +26,7 @@ cd command-center
 npm run check
 ```
 
-The build writes to `docs/command-center/`. GitHub Pages publishes `main:/docs` at [Live Orders](https://elliotttmiller.github.io/foodtruck/command-center/#/live-orders). The project root redirects there. `.github/workflows/build-command-center.yml` validates Command Center changes and commits updated static output on pushes to `main`.
+The build writes to `docs/command-center/`. GitHub Pages publishes `main:/docs` at [Live Orders](https://elliotttmiller.github.io/foodtruck/command-center/#/live-orders). The project root redirects there. Before pushing a Command Center change, run `npm run check` inside `command-center/` and commit both the source changes and the generated `docs/command-center/` output. No GitHub Actions build is used.
 
 To preview the actual ticket layout without credentials or a real sale, open [Live Orders preview](https://elliotttmiller.github.io/foodtruck/command-center/#/live-orders-demo). Sample tickets are browser-only: use **Add test order**, **Ready**, and **Complete** to rehearse the workflow. Exit preview to return to authenticated live orders. This does not verify the Square integration.
 
