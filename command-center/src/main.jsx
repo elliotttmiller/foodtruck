@@ -5,6 +5,7 @@ import { AppStoreProvider } from './lib/store.jsx';
 import './styles.css';
 import './job-reconciliation.css';
 import './live-orders.css';
+import './mobile.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
