@@ -61,6 +61,8 @@ export function LiveOrdersPage(){
   const selectedOrder=orders.find(order=>order.id===selectedId);
   const closeDetail=useCallback(()=>setSelectedId(null),[]);
   const closeMenu=useCallback(()=>setMenuOpen(false),[]);
+  const closeManage=useCallback(()=>setManageOpen(false),[]);
+  const refreshOrders=useCallback(()=>load(sessionRef.current.accessToken),[load]);
   useEffect(()=>{if(selectedId&&!selectedOrder)setSelectedId(null);},[selectedId,selectedOrder]);
 
   if(!authorized)return <section className="live-auth"><div className="live-auth-card"><img src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><h1>Staff Sign In</h1><p>Sign in to open the Square-synchronized service board.</p><form onSubmit={login}><label htmlFor="live-username">Username</label><input id="live-username" type="text" autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} autoFocus required/><label htmlFor="live-password">Password</label><input id="live-password" type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required/><button type="submit" className="live-primary">Open Live Orders</button></form>{error?<div className="live-error"><AlertTriangle size={16}/>{error}</div>:null}</div></section>;
@@ -82,6 +84,6 @@ export function LiveOrdersPage(){
     </div>
     {selectedOrder?<OrderDetail order={selectedOrder} busy={busyId===selectedOrder.id} onClose={closeDetail} onMove={move}/>:null}
     {menuOpen?<MenuQuickReference onClose={closeMenu}/>:null}
-    {manageOpen?<OrderManagement orders={orders} token={session.accessToken} onClose={()=>setManageOpen(false)} onChanged={()=>load(session.accessToken)}/>:null}
+    {manageOpen?<OrderManagement orders={orders} token={session.accessToken} onClose={closeManage} onChanged={refreshOrders}/>:null}
   </main>;
 }
