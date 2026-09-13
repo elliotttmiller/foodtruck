@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, BookOpen, RefreshCw, X } from 'lucide-react';
+import { AlertTriangle, BookOpen, CheckCircle2, RefreshCw, X } from 'lucide-react';
 import { MenuQuickReference } from '../components/MenuQuickReference.jsx';
 import { KitchenTimers } from '../components/KitchenTimers.jsx';
 import { OrderManagement } from '../components/OrderManagement.jsx';
@@ -18,14 +18,33 @@ function OrderDetail({order,busy,onClose,onMove}){
   const dialogRef=useRef(null);
   useEffect(()=>{const previous=document.activeElement;closeRef.current?.focus();const onKeyDown=event=>{if(event.key==='Escape'){event.preventDefault();onClose();}if(event.key==='Tab'){const controls=[...dialogRef.current.querySelectorAll('button:not(:disabled)')];const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}};document.addEventListener('keydown',onKeyDown);return()=>{document.removeEventListener('keydown',onKeyDown);previous?.focus?.();};},[onClose]);
   const isActive=order.status==='active';
+  const isReady=order.status==='ready';
   const received=order.source_created_at||order.created_at;
   return <div className="order-dialog-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)onClose();}}>
-    <section className={`order-dialog ${isActive?'':'is-ready'}`} role="dialog" aria-modal="true" aria-labelledby="order-dialog-title" ref={dialogRef}>
-      <div className="order-dialog-header"><div className="order-dialog-top"><span className="order-dialog-state">{isActive?'ACTIVE ORDER':'READY FOR PICKUP'}</span><button className="order-dialog-x" type="button" aria-label="Close order details" onClick={onClose} ref={closeRef}><X size={22}/></button></div><div className="order-dialog-heading"><h2 id="order-dialog-title">#{order.ticket_number}{order.customer_name?<span>{order.customer_name}</span>:null}</h2><time dateTime={received}>{elapsed(received)}</time></div><p>Received {received?serviceTime.format(new Date(received)):'—'} <span aria-hidden="true">·</span> {itemCount(order.items)} {itemCount(order.items)===1?'item':'items'}</p></div>
+    <section className={`order-dialog ${isReady?'is-ready':order.status==='complete'?'is-complete':''}`} role="dialog" aria-modal="true" aria-labelledby="order-dialog-title" ref={dialogRef}>
+      <div className="order-dialog-header"><div className="order-dialog-top"><span className="order-dialog-state">{isActive?'ACTIVE ORDER':isReady?'READY FOR PICKUP':'COMPLETED'}</span><button className="order-dialog-x" type="button" aria-label="Close order details" onClick={onClose} ref={closeRef}><X size={22}/></button></div><div className="order-dialog-heading"><h2 id="order-dialog-title">#{order.ticket_number}{order.customer_name?<span>{order.customer_name}</span>:null}</h2><time dateTime={received}>{order.status==='complete'&&order.completed_at?`Done ${elapsed(order.completed_at)}`:elapsed(received)}</time></div><p>Received {received?serviceTime.format(new Date(received)):'—'} <span aria-hidden="true">·</span> {itemCount(order.items)} {itemCount(order.items)===1?'item':'items'}</p></div>
       <div className="order-dialog-items">{(order.items||[]).map((item,index)=><div className="order-dialog-line" key={item.uid||`${item.name}-${index}`}><strong className="order-dialog-quantity">{item.quantity||1} ×</strong><div><h3>{item.name||'Item'}</h3>{item.variation?<p>{item.variation}</p>:null}{(item.modifiers||[]).map((modifier,i)=><p key={`${modifier}-${i}`}>{modifier}</p>)}{item.note?<p className="order-dialog-note">{item.note}</p>:null}</div></div>)}</div>
-      <div className="order-dialog-footer"><button className="order-dialog-close" type="button" onClick={onClose}>Close</button><button className={isActive?'ready-button':'complete-button'} type="button" disabled={busy} onClick={()=>onMove(order,isActive?'ready':'complete')}>{busy?'Updating…':isActive?'Mark Ready':'Complete Order'}</button></div>
+      <div className="order-dialog-footer"><button className="order-dialog-close" type="button" onClick={onClose}>Close</button>{order.status!=='complete'?<button className={isActive?'ready-button':'complete-button'} type="button" disabled={busy} onClick={()=>onMove(order,isActive?'ready':'complete')}>{busy?'Updating…':isActive?'Mark Ready':'Complete Order'}</button>:null}</div>
     </section>
   </div>;
+}
+
+function UnifiedOrderCard({order,busy,onOpen,onMove}){
+  const count=itemCount(order.items);
+  const urgency=order.status==='active'?orderUrgency(order):'normal';
+  const isReady=order.status==='ready';
+  return <article className={`unified-order-card ${order.status} ${urgency}`}>
+    <button className="unified-order-open" type="button" onClick={()=>onOpen(order.id)} aria-label={`View order #${order.ticket_number}`}>
+      <div className="unified-order-top"><div className="unified-order-id"><strong>#{order.ticket_number}</strong><span>{count} {count===1?'item':'items'}</span></div><time>{isReady?`Ready ${elapsed(order.ready_at)}`:elapsed(order.source_created_at||order.created_at)}</time></div>
+      <OrderItems items={order.items}/>
+    </button>
+    <button type="button" className={isReady?'complete-button':'ready-button'} disabled={busy} onClick={()=>onMove(order,isReady?'complete':'ready')}>{busy?'Updating…':isReady?'Complete':'Mark Ready'}</button>
+  </article>;
+}
+
+function CompletedOrderRow({order,onOpen}){
+  const count=itemCount(order.items);
+  return <button type="button" className="completed-order-row" onClick={()=>onOpen(order.id)} aria-label={`View completed order #${order.ticket_number}`}><span className="completed-check"><CheckCircle2 size={17}/></span><strong>#{order.ticket_number}</strong><span className="completed-order-items">{count} {count===1?'item':'items'}</span><time>{order.completed_at?serviceTime.format(new Date(order.completed_at)):'Completed'}</time></button>;
 }
 
 export function LiveOrdersPage(){
@@ -59,13 +78,15 @@ export function LiveOrdersPage(){
 
   const active=useMemo(()=>orders.filter(o=>o.status==='active'),[orders]);
   const ready=useMemo(()=>orders.filter(o=>o.status==='ready'),[orders]);
+  const completed=useMemo(()=>orders.filter(o=>o.status==='complete').toSorted((a,b)=>new Date(b.completed_at||b.updated_at)-new Date(a.completed_at||a.updated_at)),[orders]);
+  const working=useMemo(()=>[...ready,...active],[ready,active]);
   const urgentCount=active.reduce((count,order)=>count+(orderUrgency(order)==='overdue'?1:0),0);
   const selectedOrder=orders.find(order=>order.id===selectedId);
   const closeDetail=useCallback(()=>setSelectedId(null),[]);
   const closeMenu=useCallback(()=>setMenuOpen(false),[]);
   const closeManage=useCallback(()=>setManageOpen(false),[]);
   const refreshOrders=useCallback(()=>load(sessionRef.current.accessToken),[load]);
-  const jumpToLane=useCallback(lane=>{const target=document.querySelector(`.${lane}-lane .live-lane-scroll`);target?.scrollTo({top:0,left:0,behavior:'smooth'});target?.querySelector('button')?.focus({preventScroll:true});},[]);
+  const jumpToLane=useCallback(()=>document.querySelector('.live-workspace-scroll')?.scrollTo({top:0,behavior:'smooth'}),[]);
   const openFoundOrder=useCallback(order=>setSelectedId(order.id),[]);
   useEffect(()=>{const findShortcut=event=>{if(event.key==='/'&&!event.metaKey&&!event.ctrlKey&&!event.altKey&&!document.querySelector('[aria-modal="true"]')&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)){event.preventDefault();document.querySelector('.queue-finder input')?.focus();}};document.addEventListener('keydown',findShortcut);return()=>document.removeEventListener('keydown',findShortcut);},[]);
   useEffect(()=>{if(selectedId&&!selectedOrder)setSelectedId(null);},[selectedId,selectedOrder]);
@@ -80,16 +101,15 @@ export function LiveOrdersPage(){
     </header>
     {error?<div className="live-banner error" role="alert"><AlertTriangle size={17}/><span>{error}</span></div>:null}
     <QueueNavigator active={active} ready={ready} urgentCount={urgentCount} onJump={jumpToLane} onOpenOrder={openFoundOrder}/>
-    <div className="live-lanes">
-      <section className="live-lane active-lane" aria-labelledby="active-title"><div className="live-section-heading"><div><h2 id="active-title">Active Orders <span>{active.length}</span></h2><p>Oldest first. Select a ticket for details; mark Ready when finished.</p></div></div>
-        <div className="live-lane-scroll"><div className="active-grid">{active.length?active.map(order=>{const urgency=orderUrgency(order);return <article className={`order-card ${urgency}`} key={order.id}><button className="order-card-open" type="button" onClick={()=>setSelectedId(order.id)} aria-label={`View full order #${order.ticket_number}${urgency==='overdue'?', urgent':''}`}><div className="order-top"><div className="order-ticket-block"><strong className="ticket">#{order.ticket_number}</strong><span className="order-item-count">{itemCount(order.items)} {itemCount(order.items)===1?'item':'items'}</span></div><div className="order-top-actions"><time dateTime={order.source_created_at||order.created_at}>{urgency==='overdue'?<span className="order-urgency-label">Urgent</span>:null}{elapsed(order.source_created_at||order.created_at)}</time></div></div><OrderItems items={order.items}/></button><button type="button" className="ready-button" disabled={busyId===order.id} onClick={()=>move(order,'ready')}>{busyId===order.id?'Updating…':'Mark Ready'}</button></article>}):<div className="live-empty">No active orders. New paid tickets will appear here.</div>}</div></div>
-      </section>
-      <section className="live-lane ready-lane" aria-labelledby="ready-title"><div className="live-section-heading"><div><h2 id="ready-title">Ready for Pickup <span>{ready.length}</span></h2><p>Select for details; complete after pickup.</p></div></div>
-        <div className="live-lane-scroll"><div className="ready-grid">{ready.length?ready.map(order=><article className="pickup-card" key={order.id}><button className="pickup-card-open" type="button" onClick={()=>setSelectedId(order.id)} aria-label={`View full order #${order.ticket_number}`}><div className="pickup-ticket"><div><strong>#{order.ticket_number}</strong><span>{itemCount(order.items)} {itemCount(order.items)===1?'item':'items'}</span></div><time dateTime={order.ready_at||undefined}>Ready {elapsed(order.ready_at)}</time></div><div className="pickup-summary">{order.items?.length?order.items.map((item,index)=><span key={item.uid||`${item.name}-${index}`}>{item.quantity||1} × {item.name||'Item'}</span>):<span>{itemCount(order.items)} items</span>}</div></button><button type="button" className="complete-button" disabled={busyId===order.id} onClick={()=>move(order,'complete')}>{busyId===order.id?'Updating…':'Complete'}</button></article>):<div className="live-empty compact">Nothing waiting for pickup.</div>}</div></div>
-      </section>
-    </div>
+    <section className="live-workspace">
+      <div className="live-workspace-head"><div><h2>Order Queue</h2><p>Ready orders stay first, then active tickets oldest-first.</p></div><div className="live-workspace-stats"><span className="is-ready">Ready <strong>{ready.length}</strong></span><span className="is-active">Active <strong>{active.length}</strong></span>{urgentCount?<span className="is-urgent">Urgent <strong>{urgentCount}</strong></span>:null}</div></div>
+      <div className="live-workspace-body">
+        <div className="live-workspace-scroll"><div className="unified-order-grid">{working.length?working.map(order=><UnifiedOrderCard key={order.id} order={order} busy={busyId===order.id} onOpen={setSelectedId} onMove={move}/>):<div className="live-empty live-workspace-empty">No open orders. New paid tickets will appear here.</div>}</div></div>
+        <aside className="completed-rail"><div className="completed-rail-head"><div><span>History</span><h3>Completed</h3></div><strong>{completed.length}</strong></div><div className="completed-rail-list">{completed.length?completed.slice(0,30).map(order=><CompletedOrderRow key={order.id} order={order} onOpen={setSelectedId}/>):<div className="completed-rail-empty">Completed orders will appear here.</div>}</div></aside>
+      </div>
+    </section>
     {selectedOrder?<OrderDetail order={selectedOrder} busy={busyId===selectedOrder.id} onClose={closeDetail} onMove={move}/>:null}
     {menuOpen?<MenuQuickReference onClose={closeMenu}/>:null}
-    {manageOpen?<OrderManagement orders={orders} token={session.accessToken} onClose={closeManage} onChanged={refreshOrders}/>:null}
+    {manageOpen?<OrderManagement orders={orders.filter(order=>order.status==='active'||order.status==='ready')} token={session.accessToken} onClose={closeManage} onChanged={refreshOrders}/>:null}
   </main>;
 }
