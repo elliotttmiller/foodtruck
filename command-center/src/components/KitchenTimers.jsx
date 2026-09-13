@@ -1,12 +1,19 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Clock3, Pause, Play, X } from 'lucide-react';
 import { finishElapsed, remainingMs, restoreTimers, TIMER_PRESETS, timerLabels } from '../lib/kitchenTimers.js';
 import '../timers.css';
 
 const STORAGE_KEY = 'uffda-kitchen-timers-v1';
+const PANEL_KEY = 'uffda-kitchen-timer-panel-open-v1';
 function loadTimers() {
   try { return restoreTimers(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
   catch { return []; }
+}
+function loadPanelOpen() {
+  try {
+    const saved = localStorage.getItem(PANEL_KEY);
+    return saved === null ? true : saved === 'true';
+  } catch { return true; }
 }
 function display(ms) {
   const total = Math.ceil(ms / 1000);
@@ -34,7 +41,7 @@ function playFinishChime(context) {
 export function KitchenTimers() {
   const [timers, setTimers] = useState(loadTimers);
   const [now, setNow] = useState(Date.now);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(loadPanelOpen);
   const [customLabel, setCustomLabel] = useState('');
   const [minutes, setMinutes] = useState('');
   const [seconds, setSeconds] = useState('');
@@ -44,25 +51,14 @@ export function KitchenTimers() {
   const panelRef = useRef(null);
   const announced = useRef(new Set(timers.filter(timer => timer.state === 'done').map(timer => timer.id)));
 
-  useLayoutEffect(() => {
-    if (!open) return;
-    const position = () => {
-      panelRef.current.style.setProperty('--timer-panel-top', `${Math.ceil(toggleRef.current.getBoundingClientRect().bottom + 8)}px`);
-    };
-    position();
-    window.addEventListener('resize', position);
-    return () => window.removeEventListener('resize', position);
+  useEffect(() => {
+    try { localStorage.setItem(PANEL_KEY, String(open)); } catch { /* Panel still works if browser storage is unavailable. */ }
   }, [open]);
   useEffect(() => {
     panelRef.current.inert = !open;
-    if (open) panelRef.current.querySelector('button:not(:disabled)')?.focus();
-    else if (panelRef.current.contains(document.activeElement)) toggleRef.current?.focus();
-  }, [open]);
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = event => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); } };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    document.documentElement.classList.toggle('timer-panel-open', open);
+    if (!open && panelRef.current.contains(document.activeElement)) toggleRef.current?.focus();
+    return () => document.documentElement.classList.remove('timer-panel-open');
   }, [open]);
 
   useEffect(() => {
@@ -127,7 +123,7 @@ export function KitchenTimers() {
   const next = running.length ? Math.min(...running.map(timer => remainingMs(timer, now))) : null;
   return <div className="kitchen-timers">
     <button ref={toggleRef} className={`live-quiet timer-toggle ${completed.length ? 'has-finished' : ''}`} type="button" onClick={() => setOpen(value => !value)} aria-expanded={open} aria-controls="kitchen-timer-panel" aria-label={open ? 'Close kitchen timers' : `Open kitchen timers: ${running.length} running, ${completed.length} finished`} title={open ? 'Close kitchen timers' : completed.length ? `${completed.length} timer${completed.length === 1 ? '' : 's'} finished` : next === null ? 'Kitchen timers' : `${running.length} running · next in ${display(next)}`}><Clock3 size={19} aria-hidden="true"/></button>
-    <aside ref={panelRef} className={`timer-panel ${open ? 'is-open' : ''}`} id="kitchen-timer-panel" aria-label="Kitchen timers" aria-hidden={!open}><div className="timer-panel-heading"><div><h2>Kitchen timers</h2><span>{running.length} running{completed.length ? ` · ${completed.length} finished` : ''}</span></div></div>
+    <aside ref={panelRef} className={`timer-panel ${open ? 'is-open' : ''}`} id="kitchen-timer-panel" aria-label="Kitchen timers" aria-hidden={!open}><div className="timer-panel-heading"><div><h2>Kitchen timers</h2><span>{running.length} running{completed.length ? ` · ${completed.length} finished` : ''}</span></div><button className="timer-panel-close" type="button" onClick={() => setOpen(false)} aria-label="Close kitchen timers" title="Close kitchen timers"><X size={18} aria-hidden="true"/></button></div>
       <div className="timer-panel-content"><div className="timer-presets">{TIMER_PRESETS.map(preset => <button type="button" key={preset.label} onClick={() => add(preset.label, preset.seconds)} disabled={timers.length >= 30}>+ {preset.label} <small>{display(preset.seconds * 1000)}</small></button>)}</div>
         <form className="timer-custom" onSubmit={addCustom}><label htmlFor="timer-name">Custom timer</label><div><input id="timer-name" placeholder="Label" aria-label="Timer label" maxLength={40} required value={customLabel} onChange={event => setCustomLabel(event.target.value)}/><input aria-label="Minutes" title="Minutes" placeholder="min" type="number" min="0" max="240" value={minutes} onChange={event => setMinutes(event.target.value)}/><input aria-label="Seconds" title="Seconds" placeholder="sec" type="number" min="0" max="59" value={seconds} onChange={event => setSeconds(event.target.value)}/><button type="submit" disabled={timers.length >= 30 || !(Number(minutes || 0) * 60 + Number(seconds || 0))}>Start</button></div></form>
         {storageError ? <p className="timer-storage-warning" role="alert">Timers may not survive a page refresh because browser storage is unavailable.</p> : null}
