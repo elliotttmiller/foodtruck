@@ -3,6 +3,7 @@ import { AlertTriangle, BookOpen, RefreshCw, X } from 'lucide-react';
 import { MenuQuickReference } from '../components/MenuQuickReference.jsx';
 import { KitchenTimers } from '../components/KitchenTimers.jsx';
 import { OrderManagement } from '../components/OrderManagement.jsx';
+import { QueueNavigator } from '../components/QueueNavigator.jsx';
 import { clearLiveSession, ensureSession, fetchLiveOrders, loadLiveSession, requestSquareSync, setOrderStatus, signInStaff, staffStatus, subscribeToOrders } from '../lib/liveOrders.js';
 import { orderUrgency } from '../lib/orderUrgency.js';
 
@@ -58,11 +59,15 @@ export function LiveOrdersPage(){
 
   const active=useMemo(()=>orders.filter(o=>o.status==='active'),[orders]);
   const ready=useMemo(()=>orders.filter(o=>o.status==='ready'),[orders]);
+  const urgentCount=active.reduce((count,order)=>count+(orderUrgency(order)==='overdue'?1:0),0);
   const selectedOrder=orders.find(order=>order.id===selectedId);
   const closeDetail=useCallback(()=>setSelectedId(null),[]);
   const closeMenu=useCallback(()=>setMenuOpen(false),[]);
   const closeManage=useCallback(()=>setManageOpen(false),[]);
   const refreshOrders=useCallback(()=>load(sessionRef.current.accessToken),[load]);
+  const jumpToLane=useCallback(lane=>{const target=document.querySelector(`.${lane}-lane .live-lane-scroll`);target?.scrollTo({top:0,left:0,behavior:'smooth'});target?.querySelector('button')?.focus({preventScroll:true});},[]);
+  const openFoundOrder=useCallback(order=>setSelectedId(order.id),[]);
+  useEffect(()=>{const findShortcut=event=>{if(event.key==='/'&&!event.metaKey&&!event.ctrlKey&&!event.altKey&&!document.querySelector('[aria-modal="true"]')&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)){event.preventDefault();document.querySelector('.queue-finder input')?.focus();}};document.addEventListener('keydown',findShortcut);return()=>document.removeEventListener('keydown',findShortcut);},[]);
   useEffect(()=>{if(selectedId&&!selectedOrder)setSelectedId(null);},[selectedId,selectedOrder]);
 
   if(!authorized)return <section className="live-auth"><div className="live-auth-card"><img src="./brand/uff-da-logo-white.webp" alt="Uff-Da Eats"/><h1>Staff Sign In</h1><p>Sign in to open the Square-synchronized service board.</p><form onSubmit={login}><label htmlFor="live-username">Username</label><input id="live-username" type="text" autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} autoFocus required/><label htmlFor="live-password">Password</label><input id="live-password" type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required/><button type="submit" className="live-primary">Open Live Orders</button></form>{error?<div className="live-error"><AlertTriangle size={16}/>{error}</div>:null}</div></section>;
@@ -74,6 +79,7 @@ export function LiveOrdersPage(){
       <div className="live-tools"><button type="button" className="live-quiet manage-tool" onClick={()=>setManageOpen(true)}>Manage orders</button><button type="button" className="live-quiet live-icon-tool" onClick={sync} disabled={syncing} aria-label={syncing?'Refreshing from Square':'Refresh from Square'} title={syncing?'Refreshing from Square':'Refresh from Square'}><RefreshCw size={18} aria-hidden="true" className={syncing?'is-spinning':''}/></button><button type="button" className="live-quiet live-icon-tool" aria-label="Open menu quick view" title="Menu quick view" onClick={()=>setMenuOpen(true)}><BookOpen size={18} aria-hidden="true"/></button><KitchenTimers/></div>
     </header>
     {error?<div className="live-banner error" role="alert"><AlertTriangle size={17}/><span>{error}</span></div>:null}
+    <QueueNavigator active={active} ready={ready} urgentCount={urgentCount} onJump={jumpToLane} onOpenOrder={openFoundOrder}/>
     <div className="live-lanes">
       <section className="live-lane active-lane" aria-labelledby="active-title"><div className="live-section-heading"><div><h2 id="active-title">Active Orders <span>{active.length}</span></h2><p>Oldest first. Select a ticket for details; mark Ready when finished.</p></div></div>
         <div className="live-lane-scroll"><div className="active-grid">{active.length?active.map(order=>{const urgency=orderUrgency(order);return <article className={`order-card ${urgency}`} key={order.id}><button className="order-card-open" type="button" onClick={()=>setSelectedId(order.id)} aria-label={`View full order #${order.ticket_number} for ${order.customer_name||'Walk-up'}${urgency==='overdue'?', urgent':''}`}><div className="order-top"><div><strong className="ticket">#{order.ticket_number}</strong><h3>{order.customer_name||'Walk-up'}</h3><span>{itemCount(order.items)} {itemCount(order.items)===1?'item':'items'}</span></div><div className="order-top-actions"><time dateTime={order.source_created_at||order.created_at}>{urgency==='overdue'?<span className="order-urgency-label">Urgent</span>:null}{elapsed(order.source_created_at||order.created_at)}</time></div></div><OrderItems items={order.items}/></button><button type="button" className="ready-button" disabled={busyId===order.id} onClick={()=>move(order,'ready')}>{busyId===order.id?'Updating…':'Mark Ready'}</button></article>}):<div className="live-empty">No active orders. New paid tickets will appear here.</div>}</div></div>
