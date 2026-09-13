@@ -7,7 +7,7 @@ function RecipeCard({recipe,index}){
 }
 
 function RecipeSection({id,title,subtitle,recipes}){
-  return <section className="cook-guide-section" aria-labelledby={id}><div className="cook-section-heading"><div><span>BUILD GUIDE</span><h2 id={id}>{title}</h2></div><p>{subtitle}</p></div><div className={`cook-recipe-grid ${recipes.length===3?'is-three':''}`}>{recipes.map((recipe,index)=><RecipeCard recipe={recipe} index={index} key={recipe.name}/>)}</div>{title==='Smash Burgers'?<p className="cook-section-note"><strong>On request:</strong> add lettuce or tomato at no charge.</p>:null}</section>;
+  return <section className="cook-guide-section" aria-labelledby={id}><div className="cook-section-heading"><div><span>BUILD GUIDE</span><h2 id={id}>{title}</h2></div><p>{subtitle}</p></div><div className={`cook-recipe-grid ${recipes.length===3?'is-three':''}`}>{recipes.map((recipe,index)=><RecipeCard recipe={recipe} index={index} key={recipe.name}/>)}</div>{title==='Smash Burgers'?<aside className="cook-section-note" aria-label="Optional burger add-ons"><strong>Optional add-ons</strong><span>Lettuce</span><span>Tomato</span><span>Grilled onions</span></aside>:null}</section>;
 }
 
 export function MenuQuickReference({onClose}){
