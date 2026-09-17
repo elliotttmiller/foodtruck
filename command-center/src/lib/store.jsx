@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { GENERIC_MODULES } from '../config/modules.js';
+import { CUSTOMER_MENU, CUSTOMER_MENU_SEED_VERSION } from '../config/customerMenu.js';
 import { SCHEMA_VERSION } from './finance.js';
 
 const STORE_KEY = 'ftcc.live.v3';
@@ -9,9 +10,9 @@ const CLIENT_ID = crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
 
 function emptyState() {
   return {
-    meta:{ schemaVersion:SCHEMA_VERSION, revision:0, updatedAt:null },
+    meta:{ schemaVersion:SCHEMA_VERSION, customerMenuSeedVersion:CUSTOMER_MENU_SEED_VERSION, revision:0, updatedAt:null },
     settings:{ businessName:'Uff-Da Eats', currency:'USD', defaultProcessingPct:'0', defaultProcessingFixed:'0', defaultOverhead:'0' },
-    ingredients:[], jobSessions:[], dailyReports:[], sales:[], customers:[], events:[], inventory:[], menu:[], purchases:[], vendors:[], labor:[], expenses:[],
+    ingredients:[], jobSessions:[], dailyReports:[], sales:[], customers:[], events:[], inventory:[], menu:structuredClone(CUSTOMER_MENU), purchases:[], vendors:[], labor:[], expenses:[],
   };
 }
 
@@ -19,6 +20,10 @@ export function normalizeState(input) {
   const base = emptyState();
   const next = { ...base, ...(input || {}), meta:{...base.meta,...(input?.meta || {})}, settings:{...base.settings,...(input?.settings || {})} };
   [...Object.keys(GENERIC_MODULES), 'ingredients', 'jobSessions', 'dailyReports'].forEach(key => { if (!Array.isArray(next[key])) next[key] = []; });
+  if (Number(input?.meta?.customerMenuSeedVersion) < CUSTOMER_MENU_SEED_VERSION) {
+    if (!next.menu.length) next.menu = structuredClone(CUSTOMER_MENU);
+    next.meta.customerMenuSeedVersion = CUSTOMER_MENU_SEED_VERSION;
+  }
   next.meta.schemaVersion = SCHEMA_VERSION;
   return next;
 }
