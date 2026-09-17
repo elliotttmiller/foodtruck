@@ -12,9 +12,9 @@ export default defineConfig({
     cssCodeSplit: false,
     rollupOptions: {
       output: {
-        entryFileNames: 'assets/app.js',
+        entryFileNames: 'assets/app-[hash].js',
         chunkFileNames: 'assets/[name].js',
-        assetFileNames: assetInfo => assetInfo.name?.endsWith('.css') ? 'assets/app.css' : 'assets/[name][extname]'
+        assetFileNames: assetInfo => assetInfo.name?.endsWith('.css') ? 'assets/app-[hash].css' : 'assets/[name][extname]'
       }
     }
   }
