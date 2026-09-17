@@ -12,6 +12,8 @@
   .page-heading p{max-width:100%;font-size:12px;line-height:1.4}
   .top-actions{flex:none;gap:6px}
   .content{padding:14px 12px calc(28px + env(safe-area-inset-bottom))}
+  .live-orders-route .content{padding:0;overflow:visible}
+  .live-orders-route .live-board{height:auto;min-height:calc(100dvh - 126px)}
   .surface,.metric-card,.profit-card{border-radius:10px}
   .section-head{padding:15px 14px;gap:10px}
   .section-head h2{font-size:16px}
