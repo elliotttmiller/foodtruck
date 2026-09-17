@@ -20,7 +20,7 @@ export function normalizeState(input) {
   const base = emptyState();
   const next = { ...base, ...(input || {}), meta:{...base.meta,...(input?.meta || {})}, settings:{...base.settings,...(input?.settings || {})} };
   [...Object.keys(GENERIC_MODULES), 'ingredients', 'jobSessions', 'dailyReports'].forEach(key => { if (!Array.isArray(next[key])) next[key] = []; });
-  if (Number(input?.meta?.customerMenuSeedVersion) < CUSTOMER_MENU_SEED_VERSION) {
+  if (!next.menu.length || Number(input?.meta?.customerMenuSeedVersion) < CUSTOMER_MENU_SEED_VERSION) {
     if (!next.menu.length) next.menu = structuredClone(CUSTOMER_MENU);
     next.meta.customerMenuSeedVersion = CUSTOMER_MENU_SEED_VERSION;
   }
